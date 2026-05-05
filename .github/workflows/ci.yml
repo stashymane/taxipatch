@@ -12,13 +12,15 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         target: [ i686-pc-windows-gnu ]
-        profile: [ debug ]
+        profile: [ dev ] # release
 
     runs-on: ${{ matrix.os }}
     
     steps:
       - name: Install dependencies
-        run: sudo apt-get install -y --no-install-recommends gcc-mingw-w64-i686
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc-mingw-w64-i686
         if: matrix.target == 'i686-pc-windows-gnu'
 
       - uses: actions/checkout@v6
@@ -27,11 +29,11 @@ jobs:
         with:
           targets: ${{ matrix.target }}
           inherit-toolchain: true
-          cache-extra-identifier: ${{ matrix.os }}-${{ matrix.target }}
+          cache-extra-identifier: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.profile }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: cargo build --target ${{ matrix.target }}
+      - run: cargo build --target ${{ matrix.target }} --profile ${{ matrix.profile }}
       - run: |
           OUT_PATH="target/${{ matrix.target }}/debug"
           mv "$OUT_PATH/taxipatch.dll" "$OUT_PATH/taxipatch.asi"
