@@ -18,7 +18,7 @@ jobs:
     
     steps:
       - name: Install dependencies
-        run: sudo apt-get install gcc-mingw-w64
+        run: sudo apt-get install -y gcc-mingw-w64
         if: matrix.target == 'i686-pc-windows-gnu'
 
       - uses: actions/checkout@v6
@@ -28,6 +28,8 @@ jobs:
           targets: ${{ matrix.target }}
           inherit-toolchain: true
           cache-extra-identifier: ${{ matrix.os }}-${{ matrix.target }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - run: cargo build
       - run: |
