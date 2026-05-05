@@ -1,3 +1,4 @@
+pub mod hooks;
 pub mod settings;
 pub mod windows;
 
@@ -9,7 +10,7 @@ use ::windows::Win32::System::SystemServices::*;
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case, unused_variables)]
-extern "system" fn DllMain(
+pub unsafe extern "system" fn DllMain(
     dll_module: HINSTANCE,
     call_reason: u32,
     reserved: *mut std::ffi::c_void,

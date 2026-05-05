@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - "master"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        target: [ i686-pc-windows-gnu ]
+        profile: [ debug ]
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: moonrepo/setup-rust@v1
+        with:
+          targets: ${{ matrix.target }}
+          inherit-toolchain: true
+          cache-extra-identifier: ${{ matrix.os }}-${{ matrix.target }}
+
+      - run: cargo build
+      - run: |
+          OUT_PATH="target/${{ matrix.target }}/debug"
+          mv "$OUT_PATH/taxipatch.dll" "$OUT_PATH/taxipatch.asi"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: taxipatch
+          path: target/${{ matrix.target }}/taxipatch.asi
