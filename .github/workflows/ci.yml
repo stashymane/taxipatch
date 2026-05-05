@@ -17,6 +17,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     
     steps:
+      - name: Install dependencies
+        run: sudo apt-get install gcc-mingw-w64
+        if: matrix.target == 'i686-pc-windows-gnu'
+
       - uses: actions/checkout@v6
 
       - uses: moonrepo/setup-rust@v1
