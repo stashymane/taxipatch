@@ -1,7 +1,12 @@
-use windows::core::*;
-use windows::Win32::Foundation::*;
-use windows::Win32::System::SystemServices::*;
-use windows::Win32::UI::WindowsAndMessaging::*;
+pub mod settings;
+pub mod windows;
+
+use crate::settings::Settings;
+use crate::windows::debug::message_box;
+use ::windows::core::*;
+use ::windows::Win32::Foundation::HINSTANCE;
+use ::windows::Win32::Foundation::*;
+use ::windows::Win32::System::SystemServices::*;
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case, unused_variables)]
@@ -11,14 +16,12 @@ extern "system" fn DllMain(
     reserved: *mut std::ffi::c_void,
 ) -> BOOL {
     if call_reason == DLL_PROCESS_ATTACH {
-        unsafe {
-            let _ = MessageBoxA(
-                Option::from(HWND::default()),
-                s!("hello world"),
-                s!("taxipatch"),
-                MB_OK | MB_ICONINFORMATION,
-            );
-        }
+        init();
     }
     TRUE
+}
+
+fn init() {
+    let settings = Settings::load();
+    message_box("taxipatch config", &format!("{:?}", settings))
 }
