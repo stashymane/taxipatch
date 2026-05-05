@@ -16,7 +16,7 @@ fi
 
 # --- run
 cargo build
-cp taxipatch.asi "$TARGET_DIR/"
+cp target/i686-pc-windows-gnu/debug/taxipatch.dll "$TARGET_DIR/taxipatch.asi"
 
 if [ $# -gt 0 ]; then
     exec "$@"
