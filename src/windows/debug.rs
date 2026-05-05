@@ -23,3 +23,10 @@ where
 {
     unsafe { OutputDebugStringW(&HSTRING::from(message)) }
 }
+
+#[macro_export]
+macro_rules! log {
+    ($($arg:tt)*) => {
+        $crate::windows::debug::debug_log(&format!("taxipatch: {}", format!($($arg)*)));
+    }
+}

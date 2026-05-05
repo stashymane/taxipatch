@@ -2,7 +2,6 @@ pub mod settings;
 pub mod windows;
 
 use crate::settings::Settings;
-use crate::windows::debug::debug_log;
 use ::windows::core::*;
 use ::windows::Win32::Foundation::HINSTANCE;
 use ::windows::Win32::Foundation::*;
@@ -23,5 +22,5 @@ extern "system" fn DllMain(
 
 fn init() {
     let settings = Settings::load();
-    debug_log(format!("taxipatch: loaded configuration {:?}", settings));
+    log!("loaded config: {:?}", settings);
 }
