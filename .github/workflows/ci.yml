@@ -18,7 +18,7 @@ jobs:
     
     steps:
       - name: Install dependencies
-        run: sudo apt-get install -y gcc-mingw-w64
+        run: sudo apt-get install -y --no-install-recommends gcc-mingw-w64-i686
         if: matrix.target == 'i686-pc-windows-gnu'
 
       - uses: actions/checkout@v6
@@ -31,7 +31,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: cargo build
+      - run: cargo build --target ${{ matrix.target }}
       - run: |
           OUT_PATH="target/${{ matrix.target }}/debug"
           mv "$OUT_PATH/taxipatch.dll" "$OUT_PATH/taxipatch.asi"
@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: taxipatch
-          path: target/${{ matrix.target }}/taxipatch.asi
+          path: target/${{ matrix.target }}/${{ matrix.profile }}/taxipatch.asi
