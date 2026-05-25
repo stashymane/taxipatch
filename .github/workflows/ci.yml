@@ -38,8 +38,18 @@ jobs:
           OUT_PATH="target/${{ matrix.target }}/debug"
           mv "$OUT_PATH/taxipatch.dll" "$OUT_PATH/taxipatch.asi"
 
+      - name: Upload debug artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: taxipatch-debug
+          archive: false
+          path: |
+            target/${{ matrix.target }}/debug/taxipatch.asi
+
       - name: Upload release artifact
         uses: actions/upload-artifact@v7
         with:
-          name: taxipatch
-          path: target/${{ matrix.target }}/${{ matrix.profile }}/taxipatch.asi
+          name: taxipatch-release
+          archive: false
+          path: |
+            target/${{ matrix.target }}/release/taxipatch.asi
