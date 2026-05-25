@@ -1,13 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
-if [ $# -lt 1 ]; then
-    echo "Usage: $0 <target_directory> <command> [args...]"
+if [ -z ${TARGET_DIR+x} ]; then
+    echo "TARGET_DIR variable must be set to the plugin directory"
     exit 1
 fi
 
-TARGET_DIR="$1"
-shift
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <command> [args...]"
+    exit 1
+fi
 
 if [ ! -d "$TARGET_DIR" ]; then
     echo "Error: Directory '$TARGET_DIR' does not exist."

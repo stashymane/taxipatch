@@ -47,6 +47,26 @@ impl Settings {
     }
 }
 
+impl WindowSettings {
+    pub fn resolution_u32(&self) -> Option<(u32, u32)> {
+        let normalized = self.resolution.trim().to_ascii_lowercase();
+        let mut parts = normalized.split('x');
+
+        let width = parts.next()?.trim().parse::<u32>().ok()?;
+        let height = parts.next()?.trim().parse::<u32>().ok()?;
+
+        if parts.next().is_some() {
+            return None;
+        }
+
+        if width == 0 || height == 0 {
+            return None;
+        }
+
+        Some((width, height))
+    }
+}
+
 fn default_resolution() -> String {
     let info = get_display_info();
     format!("{}x{}", info.width, info.height)
