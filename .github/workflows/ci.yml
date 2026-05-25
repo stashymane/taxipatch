@@ -39,6 +39,7 @@ jobs:
           mv "$OUT_PATH/taxipatch.dll" "$OUT_PATH/taxipatch.asi"
 
       - name: Upload debug artifact
+        if: matrix.profile != 'release'
         uses: actions/upload-artifact@v7
         with:
           name: taxipatch-debug
@@ -47,6 +48,7 @@ jobs:
             target/${{ matrix.target }}/debug/taxipatch.asi
 
       - name: Upload release artifact
+        if: matrix.profile == 'release'
         uses: actions/upload-artifact@v7
         with:
           name: taxipatch-release
