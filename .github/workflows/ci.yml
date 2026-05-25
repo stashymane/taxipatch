@@ -12,7 +12,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         target: [ i686-pc-windows-gnu ]
-        profile: [ dev ] # release
+        profile: [ debug ] # release
 
     runs-on: ${{ matrix.os }}
     
