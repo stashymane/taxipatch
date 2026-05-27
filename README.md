@@ -7,7 +7,7 @@ Patch for Crazy Taxi 3. Successor to CT3Tweaks.
 
 ## Requirements
 
-Only tested with the Fairlight `CT3.exe` executable. Others may work or crash at random.
+Only tested with the Fairlight `CT3.exe` executable. Others will refuse to start for now.
 
 > [!NOTE]
 > If you have used CT3Tweaks before on your game, make sure to remove the patched version and restore the backup (rename

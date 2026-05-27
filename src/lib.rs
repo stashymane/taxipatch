@@ -23,10 +23,7 @@ pub unsafe extern "system" fn DllMain(
             eprintln!("{:?}", e);
             message_box(
                 "Failed to apply taxipatch",
-                format!(
-                    "Error: {:?}\r\n\r\nThe game will now close. Please report this issue in the issue tracker.",
-                    e
-                ),
+                format!("{:?}\r\n\r\nThe game will now close.", e),
             );
             exit(1);
         }

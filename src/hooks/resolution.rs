@@ -1,4 +1,5 @@
 use crate::data::PatchContext;
+use crate::log;
 use retour::static_detour;
 use windows::Win32::Foundation::HINSTANCE;
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
@@ -10,6 +11,11 @@ static_detour! {
 }
 
 pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
+    if !ctx.settings.patches.resolution {
+        log!("Resolution patch disabled, skipping");
+        return Ok(());
+    }
+
     let (width, height) = ctx.settings.window.resolution_u32().unwrap();
 
     unsafe {
