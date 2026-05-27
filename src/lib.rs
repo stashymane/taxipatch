@@ -1,9 +1,8 @@
+pub mod data;
 pub mod hooks;
-pub mod settings;
 pub mod windows;
 
-use crate::hooks::offsets::Offsets;
-use crate::settings::Settings;
+use crate::data::PatchContext;
 use crate::windows::debug::message_box;
 use anyhow::Context;
 use std::process::exit;
@@ -36,13 +35,10 @@ pub unsafe extern "system" fn DllMain(
 }
 
 fn init() -> anyhow::Result<()> {
-    let settings = Settings::load();
-    log!("loaded config: {:?}", settings);
+    let ctx = PatchContext::load()?;
+    log!("loaded context: {:?}", ctx);
 
-    let offsets = Offsets::get_fairlight();
-
-    hooks::resolution::initialize(&offsets, &settings)
-        .context("Failed to apply resolution patch")?;
+    hooks::resolution::initialize(&ctx).context("Failed to apply resolution patch")?;
 
     Ok(())
 }

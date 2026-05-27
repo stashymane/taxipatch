@@ -1,5 +1,4 @@
-use crate::hooks::offsets::Offsets;
-use crate::settings::Settings;
+use crate::data::PatchContext;
 use retour::static_detour;
 use windows::Win32::Foundation::HINSTANCE;
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
@@ -10,17 +9,17 @@ static_detour! {
     pub static ResolutionHook: unsafe extern "stdcall" fn(HINSTANCE, HINSTANCE, *mut u8, i32) -> i32;
 }
 
-pub fn initialize(offsets: &Offsets, settings: &Settings) -> Result<(), retour::Error> {
-    let (width, height) = settings.window.resolution_u32().unwrap();
+pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
+    let (width, height) = ctx.settings.window.resolution_u32().unwrap();
 
     unsafe {
         let base = GetModuleHandleA(None).unwrap().0 as usize;
 
         let continuation: WinMainContinuationFn =
-            std::mem::transmute(base + offsets.resolution_continuation);
+            std::mem::transmute(base + ctx.offsets.resolution_continuation);
 
-        let width_offset = offsets.resolution_width;
-        let height_offset = offsets.resolution_height;
+        let width_offset = ctx.offsets.resolution_width;
+        let height_offset = ctx.offsets.resolution_height;
 
         ResolutionHook.initialize(
             continuation,

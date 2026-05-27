@@ -1,4 +1,5 @@
 use crate::windows::display::get_display_info;
+use anyhow::Context;
 use config::{Config, File};
 use serde::{Deserialize, Serialize};
 
@@ -37,13 +38,13 @@ impl Default for Settings {
 }
 
 impl Settings {
-    pub fn load() -> Self {
+    pub fn load() -> anyhow::Result<Self> {
         let config = Config::builder()
             .add_source(File::with_name("taxipatch.ini").required(false))
             .build()
-            .unwrap();
+            .context("Failed to load settings")?;
 
-        config.try_deserialize().unwrap()
+        config.try_deserialize().context("Failed to parse settings")
     }
 }
 

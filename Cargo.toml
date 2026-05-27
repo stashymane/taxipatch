@@ -20,5 +20,7 @@ thiserror = "2.0.18"
 anyhow = "1.0.102"
 config = { version = "0.15.22", features = ["ini"], default-features = false }
 serde = { version = "1.0.228", features = ["derive"] }
+sha2 = "0.11.0"
+hex = "0.4.3"
 
 retour = { version = "0.4.0-alpha.4", features = ["nightly", "thiscall-abi", "static-detour"] }
