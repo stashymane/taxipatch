@@ -7,6 +7,16 @@ pub struct WindowSettings {
     pub resolution: String,
     #[serde(default = "default_refresh_rate")]
     pub refresh_rate: u32,
+    #[serde(default = "default_window_mode")]
+    pub mode: WindowMode,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub enum WindowMode {
+    Fullscreen,
+    #[default]
+    Borderless,
+    Windowed,
 }
 
 impl WindowSettings {
@@ -34,6 +44,7 @@ impl Default for WindowSettings {
         Self {
             resolution: default_resolution(),
             refresh_rate: default_refresh_rate(),
+            mode: default_window_mode(),
         }
     }
 }
@@ -45,4 +56,8 @@ fn default_resolution() -> String {
 
 fn default_refresh_rate() -> u32 {
     get_display_info().refresh_rate
+}
+
+fn default_window_mode() -> WindowMode {
+    WindowMode::Borderless
 }

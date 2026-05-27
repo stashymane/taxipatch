@@ -52,3 +52,5 @@ fn patch_resolution(width_offset: usize, height_offset: usize, width: u32, heigh
         *height_ptr = height;
     }
 }
+
+// TODO borderless/windowed hook
