@@ -15,6 +15,8 @@ pub struct Offsets {
     pub cd3d_init_window: usize,
     pub build_present_params: usize,
 
+    pub frame_limiter_update: usize,
+
     pub boot_logo_sequence_update: usize,
     pub boot_logo_frame_counter: usize,
 
@@ -42,6 +44,8 @@ impl Offsets {
 
             cd3d_init_window: base + 0x00028da0,
             build_present_params: base + 0x000283d0,
+
+            frame_limiter_update: base + 0x00007d00,
 
             boot_logo_sequence_update: base + 0x0002e160,
             boot_logo_frame_counter: base + 0x00317884,

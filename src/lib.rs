@@ -48,6 +48,7 @@ fn init() -> anyhow::Result<()> {
             log!("loaded context: {:?}", ctx);
 
             hooks::resolution::initialize(&ctx).context("Failed to apply resolution patch")?;
+            hooks::fps::initialize(&ctx).context("Failed to apply framerate patch")?;
             hooks::camera::initialize(&ctx).context("Failed to apply camera patch")?;
             if ctx.settings.patches.skip_intro {
                 hooks::skip_intro::initialize(&ctx).context("Failed to apply intro skip patch")?;
