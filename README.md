@@ -43,6 +43,7 @@ Most of the values provided here are defaults and can be commented out or remove
 resolution = "1920x1080" # uses primary monitor resolution by default
 refresh_rate = 240 # same as resolution
 mode = Borderless # either Fullscreen, Borderless (default) or Windowed
+fov = 90 # default is 60 on a 4:3 monitor, aspect ratio is calculated automatically
 
 [patches]
 skip_intro = true

@@ -13,9 +13,10 @@ pub struct Offsets {
     pub init_post_resolution_switch: usize,
 
     pub cd3d_init_window: usize,
+    pub build_present_params: usize,
+
     pub boot_logo_sequence_update: usize,
     pub boot_logo_frame_counter: usize,
-    pub build_present_params: usize,
 
     pub set_camera_perspective: usize,
 }
@@ -40,9 +41,10 @@ impl Offsets {
             init_post_resolution_switch: base + 0x00007a97,
 
             cd3d_init_window: base + 0x00028da0,
+            build_present_params: base + 0x000283d0,
+
             boot_logo_sequence_update: base + 0x0002e160,
             boot_logo_frame_counter: base + 0x00317884,
-            build_present_params: base + 0x000283d0,
 
             set_camera_perspective: base + 0x0001ee10,
         })
@@ -72,6 +74,9 @@ impl User32DllOffsets {
 pub struct GlobalOffsets {
     pub dw_creation_width: usize,
     pub dw_creation_height: usize,
+
+    pub game_stage: usize,
+    pub game_substage: usize,
 }
 
 impl GlobalOffsets {
@@ -79,6 +84,9 @@ impl GlobalOffsets {
         Self {
             dw_creation_width: base + 0x001EC5F8,
             dw_creation_height: base + 0x001EC5FC,
+
+            game_stage: base + 0x003bc330,
+            game_substage: base + 0x003bc334,
         }
     }
 }
