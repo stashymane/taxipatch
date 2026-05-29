@@ -7,10 +7,7 @@ pub struct PatchContext {
 }
 
 impl PatchContext {
-    pub fn from(offsets: Offsets) -> anyhow::Result<PatchContext> {
-        Ok(PatchContext {
-            offsets,
-            settings: Settings::load()?,
-        })
+    pub fn from(offsets: Offsets, settings: Settings) -> anyhow::Result<PatchContext> {
+        Ok(PatchContext { offsets, settings })
     }
 }

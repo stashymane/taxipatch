@@ -6,7 +6,7 @@ pub mod game;
 pub mod hooks;
 pub mod windows;
 
-use crate::data::{ExecutableType, PatchContext};
+use crate::data::{ExecutableType, PatchContext, Settings};
 use crate::windows::debug::message_box;
 use anyhow::Context;
 use std::process::exit;
@@ -37,16 +37,20 @@ pub unsafe extern "system" fn DllMain(
 
 fn init() -> anyhow::Result<()> {
     let exe_type = ExecutableType::load()?;
+    let settings = Settings::load().context("Failed to load settings")?;
 
     match exe_type {
         ExecutableType::Config => {
             log!("No patches available for config - skipping...");
         }
         ExecutableType::Fairlight(offsets) => {
-            let ctx = PatchContext::from(offsets)?;
+            let ctx = PatchContext::from(offsets, settings)?;
             log!("loaded context: {:?}", ctx);
 
             hooks::resolution::initialize(&ctx).context("Failed to apply resolution patch")?;
+            if ctx.settings.patches.skip_intro {
+                hooks::skip_intro::initialize(&ctx).context("Failed to apply intro skip patch")?;
+            }
         }
     };
 

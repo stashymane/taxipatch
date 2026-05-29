@@ -3,13 +3,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PatchSettings {
     #[serde(default = "enabled")]
-    pub resolution: bool,
+    pub skip_intro: bool,
 }
 
 impl Default for PatchSettings {
     fn default() -> Self {
         Self {
-            resolution: enabled(),
+            skip_intro: enabled(),
         }
     }
 }

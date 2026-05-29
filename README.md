@@ -34,6 +34,8 @@ You may configure the resolution the game runs at by setting `resolution` or `re
 
 ## Configuration
 
+Most of the values provided here are defaults and can be commented out or removed entirely.
+
 `taxipatch.ini`
 
 ```ini
@@ -41,6 +43,9 @@ You may configure the resolution the game runs at by setting `resolution` or `re
 resolution = "1920x1080" # uses primary monitor resolution by default
 refresh_rate = 240 # same as resolution
 mode = Borderless # either Fullscreen, Borderless (default) or Windowed
+
+[patches]
+skip_intro = true
 
 ```
 

@@ -13,6 +13,8 @@ pub struct Offsets {
     pub init_post_resolution_switch: usize,
 
     pub cd3d_init_window: usize,
+    pub boot_logo_sequence_update: usize,
+    pub boot_logo_frame_counter: usize,
     pub build_present_params: usize,
 
     pub set_camera_perspective: usize,
@@ -35,12 +37,14 @@ impl Offsets {
 
             game_tick: base + 0x0007a5c0,
 
-            init_post_resolution_switch: base + 0x00007A97,
+            init_post_resolution_switch: base + 0x00007a97,
 
             cd3d_init_window: base + 0x00028da0,
+            boot_logo_sequence_update: base + 0x0002e160,
+            boot_logo_frame_counter: base + 0x00317884,
             build_present_params: base + 0x000283d0,
 
-            set_camera_perspective: base + 0x0001EE10,
+            set_camera_perspective: base + 0x0001ee10,
         })
     }
 }
