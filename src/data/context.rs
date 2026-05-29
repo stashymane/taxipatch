@@ -1,21 +1,16 @@
-use crate::data::{GameType, Offsets, Settings};
+use crate::data::{Offsets, Settings};
 
 #[derive(Debug)]
 pub struct PatchContext {
-    pub game_type: GameType,
-    pub settings: Settings,
     pub offsets: Offsets,
+    pub settings: Settings,
 }
 
 impl PatchContext {
-    pub fn load() -> anyhow::Result<PatchContext> {
-        let game_type = GameType::load()?;
-        let offsets = Offsets::from(&game_type)?;
-
+    pub fn from(offsets: Offsets) -> anyhow::Result<PatchContext> {
         Ok(PatchContext {
-            game_type,
-            settings: Settings::load()?,
             offsets,
+            settings: Settings::load()?,
         })
     }
 }

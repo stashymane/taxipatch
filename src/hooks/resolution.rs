@@ -98,7 +98,6 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
 
                 let app: &mut CD3DApplication = &mut (*app_ptr);
 
-                pre_present_params(app, &window_settings);
                 BuildPresentParamsHook.call(app_ptr);
                 post_present_params(app, &window_settings);
             }
@@ -123,8 +122,6 @@ fn patch_resolution_globals(width_offset: usize, height_offset: usize, settings:
         *height_ptr = height;
     }
 }
-
-fn pre_present_params(app: &mut CD3DApplication, settings: &GameSettings) {}
 
 fn post_present_params(app: &mut CD3DApplication, settings: &GameSettings) {
     let (width, height) = settings.resolution_u32().unwrap();

@@ -1,4 +1,3 @@
-use crate::data::GameType;
 use anyhow::Context;
 use windows::core::PCSTR;
 use windows::Win32::System::LibraryLoader::{GetModuleHandleA, GetProcAddress};
@@ -20,12 +19,6 @@ pub struct Offsets {
 }
 
 impl Offsets {
-    pub fn from(game_type: &GameType) -> anyhow::Result<Offsets> {
-        match game_type {
-            GameType::Fairlight => Self::get_fairlight(),
-        }
-    }
-
     pub fn get_fairlight() -> anyhow::Result<Offsets> {
         let base = unsafe {
             GetModuleHandleA(None)
