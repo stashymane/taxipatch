@@ -36,7 +36,7 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
                     (fov, aspect)
                 };
 
-                return SetCameraPerspective.call(camera, fov, desired_aspect, near_clip, far_clip);
+                return SetCameraPerspective.call(camera, fov, aspect, near_clip, far_clip);
             }
         })?;
 
