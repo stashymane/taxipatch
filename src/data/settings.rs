@@ -1,22 +1,15 @@
 pub mod game;
 pub mod patches;
-pub mod window;
 
 use crate::data::game::GameSettings;
-use crate::data::patches::PatchSettings;
-use crate::data::window::WindowSettings;
 use anyhow::Context;
 use config::{Config, File};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Settings {
     #[serde(default)]
-    pub window: WindowSettings,
-    #[serde(default)]
     pub game: GameSettings,
-    #[serde(default)]
-    pub patches: PatchSettings,
 }
 
 impl Settings {

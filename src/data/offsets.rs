@@ -1,18 +1,22 @@
 use crate::data::GameType;
 use anyhow::Context;
-use windows::Win32::System::LibraryLoader::GetModuleHandleA;
+use windows::core::PCSTR;
+use windows::Win32::System::LibraryLoader::{GetModuleHandleA, GetProcAddress};
 
 #[derive(Debug)]
 pub struct Offsets {
     pub base: usize,
 
-    pub resolution_width: usize,
-    pub resolution_height: usize,
-    pub resolution_continuation: usize,
+    pub user32_dll: User32DllOffsets,
+    pub globals: GlobalOffsets,
 
-    pub intro_ticks: usize,
-    pub init_game_state: usize,
-    pub intro_state_value: usize,
+    pub game_tick: usize,
+    pub init_post_resolution_switch: usize,
+
+    pub cd3d_init_window: usize,
+    pub build_present_params: usize,
+
+    pub set_camera_perspective: usize,
 }
 
 impl Offsets {
@@ -32,13 +36,52 @@ impl Offsets {
         Ok(Offsets {
             base,
 
-            resolution_width: 0x001EC5F8,
-            resolution_height: 0x001EC5FC,
-            resolution_continuation: 0x00007A97,
+            user32_dll: User32DllOffsets::get()
+                .context("Failed to fetch offsets for USER32.DLL")?,
+            globals: GlobalOffsets::from(base),
 
-            intro_ticks: 0x000734D0,
-            init_game_state: 0x00073570,
-            intro_state_value: 0x003BD2F0,
+            game_tick: base + 0x0007a5c0,
+
+            init_post_resolution_switch: base + 0x00007A97,
+
+            cd3d_init_window: base + 0x00028da0,
+            build_present_params: base + 0x000283d0,
+
+            set_camera_perspective: base + 0x0001EE10,
         })
+    }
+}
+
+#[derive(Debug)]
+pub struct User32DllOffsets {
+    pub create_window_ex_a: usize,
+}
+
+impl User32DllOffsets {
+    pub fn get() -> anyhow::Result<Self> {
+        unsafe {
+            let user32 = GetModuleHandleA(PCSTR(b"user32.dll\0".as_ptr()))?;
+
+            Ok(Self {
+                create_window_ex_a: GetProcAddress(user32, PCSTR(b"CreateWindowExA\0".as_ptr()))
+                    .context("Failed to find USER32.DLL:CreateWindowExA")?
+                    as usize,
+            })
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct GlobalOffsets {
+    pub dw_creation_width: usize,
+    pub dw_creation_height: usize,
+}
+
+impl GlobalOffsets {
+    pub fn from(base: usize) -> Self {
+        Self {
+            dw_creation_width: base + 0x001EC5F8,
+            dw_creation_height: base + 0x001EC5FC,
+        }
     }
 }

@@ -1,7 +1,11 @@
 use crate::game::D3DDeviceSettings;
+use retour::static_detour;
 use static_assertions::assert_eq_size;
-use windows::Win32::Foundation::HWND;
+use windows::core::HRESULT;
+use windows::Win32::Foundation::{HINSTANCE, HWND};
 use windows::Win32::Graphics::Direct3D9::{IDirect3D9, IDirect3DDevice9, D3DPRESENT_PARAMETERS};
+
+assert_eq_size!(CD3DApplication, [u8; 0x36c]);
 
 #[repr(C)]
 #[derive(Debug)]
@@ -10,7 +14,7 @@ pub struct CD3DApplication {
 
     _device_enumerator: [u8; 0x2c],
 
-    pub is_windowed: u8,
+    pub is_windowed: bool,
     _pad_0x31: [u8; 0x03],
 
     pub windowed_settings: D3DDeviceSettings,
@@ -18,7 +22,7 @@ pub struct CD3DApplication {
     pub windowed_width: u32,
 
     pub fullscreen_settings: D3DDeviceSettings,
-    pub use_fallback_d3d_mode: u8,
+    pub use_fallback_d3d_mode: bool,
 
     _mbr_0x9d: [u8; 4],
     pub ignore_window_size_change: u8,
@@ -46,4 +50,6 @@ pub struct CD3DApplication {
     _field_0x36b: bool,
 }
 
-assert_eq_size!(CD3DApplication, [u8; 0x36c]);
+static_detour! {
+    pub static CD3DApplication_InitWindow: unsafe extern "thiscall" fn(*mut CD3DApplication, *mut HINSTANCE) -> HRESULT;
+}
