@@ -1,4 +1,5 @@
 use crate::data::game::{GameSettings, WindowMode};
+use crate::data::PackagedPtr;
 use crate::data::PatchContext;
 use crate::game::libs::user32::CreateWindowExAHook;
 use crate::game::{CD3DApplication, CD3DApplication_InitWindow};
@@ -90,11 +91,11 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
 
         BuildPresentParamsHook.initialize(transmute(ctx.offsets.build_present_params), {
             let window_settings = ctx.settings.game.clone();
-            let width_offset = ctx.offsets.globals.dw_creation_width;
-            let height_offset = ctx.offsets.globals.dw_creation_height;
+            let width = ctx.pointers.dw_creation_width;
+            let height = ctx.pointers.dw_creation_height;
 
             move |app_ptr| {
-                patch_resolution_globals(width_offset, height_offset, &window_settings);
+                patch_resolution_globals(width, height, &window_settings);
 
                 let app: &mut CD3DApplication = &mut (*app_ptr);
 
@@ -111,15 +112,16 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
     Ok(())
 }
 
-fn patch_resolution_globals(width_offset: usize, height_offset: usize, settings: &GameSettings) {
+fn patch_resolution_globals(
+    width: PackagedPtr<u32>,
+    height: PackagedPtr<u32>,
+    settings: &GameSettings,
+) {
     unsafe {
-        let width_ptr = width_offset as *mut u32;
-        let height_ptr = height_offset as *mut u32;
+        let (res_width, res_height) = settings.resolution_u32().unwrap();
 
-        let (width, height) = settings.resolution_u32().unwrap();
-
-        *width_ptr = width;
-        *height_ptr = height;
+        width.write(res_width);
+        height.write(res_height);
     }
 }
 

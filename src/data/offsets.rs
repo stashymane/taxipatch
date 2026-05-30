@@ -7,7 +7,6 @@ pub struct Offsets {
     pub base: usize,
 
     pub user32_dll: User32DllOffsets,
-    pub globals: GlobalOffsets,
 
     pub game_tick: usize,
     pub init_post_resolution_switch: usize,
@@ -36,7 +35,6 @@ impl Offsets {
 
             user32_dll: User32DllOffsets::get()
                 .context("Failed to fetch offsets for USER32.DLL")?,
-            globals: GlobalOffsets::from(base),
 
             game_tick: base + 0x0007a5c0,
 
@@ -70,27 +68,6 @@ impl User32DllOffsets {
                     .context("Failed to find USER32.DLL:CreateWindowExA")?
                     as usize,
             })
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct GlobalOffsets {
-    pub dw_creation_width: usize,
-    pub dw_creation_height: usize,
-
-    pub game_stage: usize,
-    pub game_substage: usize,
-}
-
-impl GlobalOffsets {
-    pub fn from(base: usize) -> Self {
-        Self {
-            dw_creation_width: base + 0x001EC5F8,
-            dw_creation_height: base + 0x001EC5FC,
-
-            game_stage: base + 0x003bc330,
-            game_substage: base + 0x003bc334,
         }
     }
 }

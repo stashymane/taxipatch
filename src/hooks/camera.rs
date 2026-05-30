@@ -23,14 +23,11 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
 
     unsafe {
         SetCameraPerspective.initialize(transmute(ctx.offsets.set_camera_perspective), {
-            let stage_addr = ctx.offsets.globals.game_stage;
-            let substage_addr = ctx.offsets.globals.game_substage;
+            let stage = ctx.pointers.game_stage;
+            let substage = ctx.pointers.game_substage;
 
             move |camera, fov, aspect, near_clip, far_clip| {
-                let stage = stage_addr as *mut u32;
-                let substage = substage_addr as *mut u32;
-
-                let (fov, aspect) = if *stage == 1 && *substage == 3 {
+                let (fov, aspect) = if stage.read() == 1 && substage.read() == 3 {
                     (desired_fov, desired_aspect)
                 } else {
                     (fov, aspect)
