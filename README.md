@@ -25,12 +25,12 @@ Only tested with the Fairlight `CT3.exe` executable. Others will refuse to start
 
 ## Patches
 
-#### Window
+* Screen resolution
+* Borderless & windowed mode
+* FOV & correct aspect ratio
+* Skip intro logos
 
-Automatically detects your primary monitor's resolution and refresh rate. Makes the game window run in that resolution.
-You may configure the resolution the game runs at by setting `resolution` or `refresh_rate` properties in the config.
-
-#### that's it for now
+#### that's it (for now)
 
 ## Configuration
 
