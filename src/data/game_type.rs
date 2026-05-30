@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io;
 use std::io::Read;
 use std::path::PathBuf;
+use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 
 const XPLOSIV_SHA256: &str = "9ad9ad77c7cab751529f03da807d3846887a47b89f48f0792cd9477f90b3a0d8";
 const FAIRLIGHT_SHA256: &str = "235d3f70cfd6ca83b853d011d53953b9425ceb0da7a84173eb508b74b443d57e";
@@ -25,9 +26,15 @@ impl ExecutableType {
     }
 
     fn from_hash(hash: &str) -> anyhow::Result<ExecutableType> {
+        let base = unsafe {
+            GetModuleHandleA(None)
+                .context("Failed to retrieve module handle")?
+                .0 as usize
+        };
+
         match hash {
-            XPLOSIV_SHA256 => Ok(ExecutableType::Xplosiv(Offsets::get_default()?)),
-            FAIRLIGHT_SHA256 => Ok(ExecutableType::Fairlight(Offsets::get_default()?)),
+            XPLOSIV_SHA256 => Ok(ExecutableType::Xplosiv(Offsets::get_default(base)?)),
+            FAIRLIGHT_SHA256 => Ok(ExecutableType::Fairlight(Offsets::get_default(base)?)),
             CT3CONFIG_SHA256 => Ok(ExecutableType::Config),
             _ => Err(anyhow!(
                 "Game executable is not supported.\r\nIf you have used CT3Tweaks on this executable before, restore the backup before running the game."

@@ -1,6 +1,6 @@
 use crate::data::game::{GameSettings, WindowMode};
-use crate::data::PackagedPtr;
-use crate::data::PatchContext;
+use crate::data::{PackagedPtr, CT3};
+use crate::data::{PatchContext, User32};
 use crate::game::libs::user32::CreateWindowExAHook;
 use crate::game::{CD3DApplication, CD3DApplication_InitWindow};
 use retour::static_detour;
@@ -14,7 +14,7 @@ static_detour! {
 
 pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
     unsafe {
-        CD3DApplication_InitWindow.initialize(transmute(ctx.offsets.cd3d_init_window), {
+        CD3DApplication_InitWindow.initialize(transmute(ctx.offsets[CT3::CD3DInitWindow]), {
             let settings = ctx.settings.game.clone();
             let (width, height) = settings.resolution_u32().unwrap();
 
@@ -39,7 +39,7 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
             }
         })?;
 
-        CreateWindowExAHook.initialize(transmute(ctx.offsets.user32_dll.create_window_ex_a), {
+        CreateWindowExAHook.initialize(transmute(ctx.offsets[User32::CreateWindowExA]), {
             let settings = ctx.settings.game.clone();
 
             move |dw_ex_style,
@@ -89,7 +89,7 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
             }
         })?;
 
-        BuildPresentParamsHook.initialize(transmute(ctx.offsets.build_present_params), {
+        BuildPresentParamsHook.initialize(transmute(ctx.offsets[CT3::BuildPresentParams]), {
             let window_settings = ctx.settings.game.clone();
             let width = ctx.pointers.dw_creation_width;
             let height = ctx.pointers.dw_creation_height;

@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use crate::data::packaged_ptr::PackagedPtr;
 
 #[derive(Debug)]
 pub struct Pointers {
@@ -7,6 +7,8 @@ pub struct Pointers {
 
     pub game_stage: PackagedPtr<u32>,
     pub game_substage: PackagedPtr<u32>,
+
+    pub boot_logo_frame_counter: PackagedPtr<i32>,
 }
 
 impl Pointers {
@@ -17,42 +19,8 @@ impl Pointers {
 
             game_stage: PackagedPtr::new(base + 0x003bc330),
             game_substage: PackagedPtr::new(base + 0x003bc334),
-        }
-    }
-}
 
-#[derive(Debug, Copy, Clone)]
-pub struct PackagedPtr<T> {
-    addr: usize,
-    _marker: PhantomData<fn() -> T>,
-}
-
-impl<T> PackagedPtr<T> {
-    pub const fn new(addr: usize) -> Self {
-        Self {
-            addr,
-            _marker: PhantomData,
-        }
-    }
-
-    pub const fn addr(self) -> usize {
-        self.addr
-    }
-
-    pub const fn ptr(self) -> *mut T {
-        self.addr as *mut T
-    }
-
-    pub unsafe fn read(self) -> T
-    where
-        T: Copy,
-    {
-        unsafe { *self.ptr() }
-    }
-
-    pub unsafe fn write(self, value: T) {
-        unsafe {
-            *self.ptr() = value;
+            boot_logo_frame_counter: PackagedPtr::new(base + 0x00317884),
         }
     }
 }

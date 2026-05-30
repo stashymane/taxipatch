@@ -1,4 +1,4 @@
-use crate::data::PatchContext;
+use crate::data::{PatchContext, CT3};
 use retour::static_detour;
 use std::mem::transmute;
 
@@ -8,15 +8,18 @@ static_detour! {
 
 pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
     unsafe {
-        BootLogoSequence_Update.initialize(transmute(ctx.offsets.boot_logo_sequence_update), {
-            let counter_offset = ctx.offsets.boot_logo_frame_counter;
-            move || {
-                let counter = counter_offset as *mut i32;
-                *counter = 1024;
+        BootLogoSequence_Update.initialize(
+            transmute(ctx.offsets[CT3::BootLogoSequenceUpdate]),
+            {
+                let counter = ctx.pointers.boot_logo_frame_counter;
 
-                BootLogoSequence_Update.call();
-            }
-        })?;
+                move || {
+                    counter.write(1024);
+
+                    BootLogoSequence_Update.call();
+                }
+            },
+        )?;
 
         BootLogoSequence_Update.enable()?;
     }

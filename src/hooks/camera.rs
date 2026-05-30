@@ -1,4 +1,4 @@
-use crate::data::PatchContext;
+use crate::data::{PatchContext, CT3};
 use retour::static_detour;
 use std::mem::transmute;
 
@@ -22,7 +22,7 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
     let desired_aspect = ctx.settings.game.aspect_ratio().unwrap();
 
     unsafe {
-        SetCameraPerspective.initialize(transmute(ctx.offsets.set_camera_perspective), {
+        SetCameraPerspective.initialize(transmute(ctx.offsets[CT3::SetCameraPerspective]), {
             let stage = ctx.pointers.game_stage;
             let substage = ctx.pointers.game_substage;
 
