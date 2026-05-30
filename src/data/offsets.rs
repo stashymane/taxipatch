@@ -24,7 +24,7 @@ pub struct Offsets {
 }
 
 impl Offsets {
-    pub fn get_fairlight() -> anyhow::Result<Offsets> {
+    pub fn get_default() -> anyhow::Result<Offsets> {
         let base = unsafe {
             GetModuleHandleA(None)
                 .context("Failed to retrieve module handle")?

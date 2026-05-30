@@ -43,7 +43,7 @@ fn init() -> anyhow::Result<()> {
         ExecutableType::Config => {
             log!("No patches available for config - skipping...");
         }
-        ExecutableType::Fairlight(offsets) => {
+        ExecutableType::Xplosiv(offsets) | ExecutableType::Fairlight(offsets) => {
             let ctx = PatchContext::from(offsets, settings)?;
             log!("loaded context: {:?}", ctx);
 
