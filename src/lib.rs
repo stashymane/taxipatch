@@ -1,5 +1,5 @@
-#[cfg(not(target_pointer_width = "32"))]
-compile_error!("This patch requires a 32-bit target because the game is 32-bit.");
+#[cfg(any(not(target_os = "windows"), not(target_pointer_width = "32")))]
+compile_error!("This patch can only be compiled for 32-bit Windows.");
 
 pub mod data;
 pub mod game;
