@@ -1,3 +1,4 @@
+use retour::static_detour;
 use static_assertions::assert_eq_size;
 
 assert_eq_size!(FrameLimiter, [u8; 0x2f]);
@@ -28,4 +29,8 @@ assert_eq_size!(TscTimer, [u8; 0x8]);
 pub struct TscTimer {
     _low: u32,
     _high: u32,
+}
+
+static_detour! {
+    pub static FrameLimiter_UpdateHook: unsafe extern "fastcall" fn(*mut FrameLimiter);
 }

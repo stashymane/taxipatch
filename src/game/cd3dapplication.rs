@@ -1,4 +1,4 @@
-use crate::game::D3DDeviceSettings;
+use crate::game::{CameraProjection, D3DDeviceSettings};
 use retour::static_detour;
 use static_assertions::assert_eq_size;
 use windows::core::HRESULT;
@@ -51,5 +51,15 @@ pub struct CD3DApplication {
 }
 
 static_detour! {
-    pub static CD3DApplication_InitWindow: unsafe extern "thiscall" fn(*mut CD3DApplication, *mut HINSTANCE) -> HRESULT;
+    pub static CD3DApplication_InitWindowHook: unsafe extern "thiscall" fn(*mut CD3DApplication, *mut HINSTANCE) -> HRESULT;
+    pub static BootLogoSequence_UpdateHook: unsafe extern "stdcall" fn();
+
+    pub static BuildPresentParamsHook: unsafe extern "thiscall" fn(*mut CD3DApplication);
+    pub static SetCameraPerspectiveHook: unsafe extern "thiscall" fn(
+        *mut CameraProjection,
+        f32,
+        f32,
+        f32,
+        f32,
+    );
 }

@@ -1,14 +1,10 @@
 use crate::data::{PatchContext, CT3};
-use retour::static_detour;
+use crate::game::BootLogoSequence_UpdateHook;
 use std::mem::transmute;
-
-static_detour! {
-    pub static BootLogoSequence_Update: unsafe extern "stdcall" fn();
-}
 
 pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
     unsafe {
-        BootLogoSequence_Update.initialize(
+        BootLogoSequence_UpdateHook.initialize(
             transmute(ctx.offsets[CT3::BootLogoSequenceUpdate]),
             {
                 let counter = ctx.pointers.boot_logo_frame_counter;
@@ -16,12 +12,12 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
                 move || {
                     counter.write(1024);
 
-                    BootLogoSequence_Update.call();
+                    BootLogoSequence_UpdateHook.call();
                 }
             },
         )?;
 
-        BootLogoSequence_Update.enable()?;
+        BootLogoSequence_UpdateHook.enable()?;
     }
     Ok(())
 }

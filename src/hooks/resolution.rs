@@ -1,43 +1,41 @@
 use crate::data::game::{GameSettings, WindowMode};
 use crate::data::{PackagedPtr, CT3};
 use crate::data::{PatchContext, User32};
-use crate::game::libs::user32::CreateWindowExAHook;
-use crate::game::{CD3DApplication, CD3DApplication_InitWindow};
-use retour::static_detour;
+use crate::game::user32::CreateWindowExAHook;
+use crate::game::{BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook};
 use std::mem::transmute;
 use windows::core::BOOL;
 use windows::Win32::UI::WindowsAndMessaging::{WS_POPUP, WS_VISIBLE};
 
-static_detour! {
-    pub static BuildPresentParamsHook: unsafe extern "thiscall" fn(*mut CD3DApplication);
-}
-
 pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
     unsafe {
-        CD3DApplication_InitWindow.initialize(transmute(ctx.offsets[CT3::CD3DInitWindow]), {
-            let settings = ctx.settings.game.clone();
-            let (width, height) = settings.resolution_u32().unwrap();
+        CD3DApplication_InitWindowHook.initialize(
+            transmute(ctx.offsets[CT3::CD3DInitWindow]),
+            {
+                let settings = ctx.settings.game.clone();
+                let (width, height) = settings.resolution_u32().unwrap();
 
-            move |app_ptr, hinstance| {
-                let app: &mut CD3DApplication = &mut (*app_ptr);
+                move |app_ptr, hinstance| {
+                    let app: &mut CD3DApplication = &mut (*app_ptr);
 
-                app.initial_window_width = width;
-                app.initial_window_height = height;
+                    app.initial_window_width = width;
+                    app.initial_window_height = height;
 
-                match settings.mode {
-                    WindowMode::Fullscreen => {
-                        app.use_fullscreen_mode = true;
-                    }
-                    WindowMode::Borderless | WindowMode::Windowed => {
-                        app.use_fullscreen_mode = false;
-                        app.is_windowed = true;
-                        app.use_fallback_d3d_mode = true;
-                    }
-                };
+                    match settings.mode {
+                        WindowMode::Fullscreen => {
+                            app.use_fullscreen_mode = true;
+                        }
+                        WindowMode::Borderless | WindowMode::Windowed => {
+                            app.use_fullscreen_mode = false;
+                            app.is_windowed = true;
+                            app.use_fallback_d3d_mode = true;
+                        }
+                    };
 
-                return CD3DApplication_InitWindow.call(app_ptr, hinstance);
-            }
-        })?;
+                    return CD3DApplication_InitWindowHook.call(app_ptr, hinstance);
+                }
+            },
+        )?;
 
         CreateWindowExAHook.initialize(transmute(ctx.offsets[User32::CreateWindowExA]), {
             let settings = ctx.settings.game.clone();
@@ -104,7 +102,7 @@ pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
             }
         })?;
 
-        CD3DApplication_InitWindow.enable()?;
+        CD3DApplication_InitWindowHook.enable()?;
         CreateWindowExAHook.enable()?;
         BuildPresentParamsHook.enable()?;
     }
