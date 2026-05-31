@@ -33,7 +33,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: cargo build --target ${{ matrix.target }} --profile ${{ matrix.profile }}
+      - run: cargo build -p taxipatch --target ${{ matrix.target }} --profile ${{ matrix.profile }}
       - run: |
           OUT_PATH="target/${{ matrix.target }}/debug"
           mv "$OUT_PATH/taxipatch.dll" "$OUT_PATH/taxipatch.asi"

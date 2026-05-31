@@ -4,11 +4,13 @@
 compile_error!("This patch can only be compiled for 32-bit Windows.");
 
 pub mod data;
+pub mod hooks;
 pub mod patch;
 pub mod patches;
 pub mod windows;
 
 use crate::data::{ExecutableType, PatchContext, Settings};
+use crate::hooks::init_hooks;
 use crate::patch::Patch;
 use crate::windows::debug::message_box;
 use anyhow::Context;
@@ -49,7 +51,7 @@ fn init() -> anyhow::Result<()> {
         }
         ExecutableType::Xplosiv(offsets) | ExecutableType::Fairlight(offsets) => {
             let ctx = PatchContext::from(offsets, settings)?;
-            log!("loaded context: {:?}", ctx);
+            log!("Loaded context: {:?}", ctx);
 
             let mut patches: Vec<_> = inventory::iter::<Patch>.into_iter().collect();
             patches.sort_by_key(|it| -it.priority);
@@ -60,6 +62,9 @@ fn init() -> anyhow::Result<()> {
                     .call_once((&ctx,))
                     .with_context(|| format!("Applying {} patch", patch.name))?;
             }
+
+            log!("Applying hooks...");
+            init_hooks(&ctx)?;
 
             Ok(())
         }
