@@ -1,5 +1,5 @@
 use crate::{CameraProjection, D3DDeviceSettings};
-use retour::static_detour;
+use retour_util::wrapped_detour;
 use static_assertions::assert_eq_size;
 use windows::core::HRESULT;
 use windows::Win32::Foundation::{HINSTANCE, HWND};
@@ -50,16 +50,16 @@ pub struct CD3DApplication {
     _field_0x36b: bool,
 }
 
-static_detour! {
-    pub static CD3DApplication_InitWindowHook: unsafe extern "thiscall" fn(*mut CD3DApplication, *mut HINSTANCE) -> HRESULT;
+wrapped_detour! {
+    pub static CD3DApplication_InitWindowHook: unsafe extern "thiscall" fn(app_ptr: *mut CD3DApplication, hinstance: *mut HINSTANCE) -> HRESULT;
     pub static BootLogoSequence_UpdateHook: unsafe extern "stdcall" fn();
 
-    pub static BuildPresentParamsHook: unsafe extern "thiscall" fn(*mut CD3DApplication);
+    pub static BuildPresentParamsHook: unsafe extern "thiscall" fn(app_ptr: *mut CD3DApplication);
     pub static SetCameraPerspectiveHook: unsafe extern "thiscall" fn(
-        *mut CameraProjection,
-        f32,
-        f32,
-        f32,
-        f32,
+        camera_projection_ptr: *mut CameraProjection,
+        fov: f32,
+        aspect: f32,
+        near_clip: f32,
+        far_clip: f32,
     );
 }
