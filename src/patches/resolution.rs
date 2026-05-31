@@ -1,13 +1,22 @@
 use crate::data::game::{GameSettings, WindowMode};
 use crate::data::{PackagedPtr, CT3};
 use crate::data::{PatchContext, User32};
+use crate::patch::Patch;
 use game::user32::CreateWindowExAHook;
 use game::{BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook};
 use std::mem::transmute;
 use windows::core::BOOL;
 use windows::Win32::UI::WindowsAndMessaging::{WS_POPUP, WS_VISIBLE};
 
-pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
+inventory::submit! {
+    Patch {
+        name: "resolution",
+        priority: 0,
+        register: initialize
+    }
+}
+
+pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     unsafe {
         CD3DApplication_InitWindowHook.initialize(
             transmute(ctx.offsets[CT3::CD3DInitWindow]),

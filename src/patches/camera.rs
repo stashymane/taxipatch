@@ -1,8 +1,17 @@
 use crate::data::{PatchContext, CT3};
+use crate::patch::Patch;
 use game::SetCameraPerspectiveHook;
 use std::mem::transmute;
 
-pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
+inventory::submit! {
+    Patch {
+        name: "camera",
+        priority: 0,
+        register: initialize
+    }
+}
+
+pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     let desired_fov = ctx.settings.game.fov;
     let desired_aspect = ctx.settings.game.aspect_ratio().unwrap();
 

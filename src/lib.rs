@@ -1,11 +1,15 @@
+#![feature(fn_traits)]
+
 #[cfg(any(not(target_os = "windows"), not(target_pointer_width = "32")))]
 compile_error!("This patch can only be compiled for 32-bit Windows.");
 
 pub mod data;
-pub mod hooks;
+pub mod patch;
+pub mod patches;
 pub mod windows;
 
 use crate::data::{ExecutableType, PatchContext, Settings};
+use crate::patch::Patch;
 use crate::windows::debug::message_box;
 use anyhow::Context;
 use std::process::exit;
@@ -41,19 +45,23 @@ fn init() -> anyhow::Result<()> {
     match exe_type {
         ExecutableType::Config => {
             log!("No patches available for config - skipping...");
+            Ok(())
         }
         ExecutableType::Xplosiv(offsets) | ExecutableType::Fairlight(offsets) => {
             let ctx = PatchContext::from(offsets, settings)?;
             log!("loaded context: {:?}", ctx);
 
-            hooks::resolution::initialize(&ctx).context("Failed to apply resolution patch")?;
-            hooks::fps::initialize(&ctx).context("Failed to apply framerate patch")?;
-            hooks::camera::initialize(&ctx).context("Failed to apply camera patch")?;
-            if ctx.settings.patches.skip_intro {
-                hooks::skip_intro::initialize(&ctx).context("Failed to apply intro skip patch")?;
-            }
-        }
-    };
+            let mut patches: Vec<_> = inventory::iter::<Patch>.into_iter().collect();
+            patches.sort_by_key(|it| -it.priority);
 
-    Ok(())
+            for patch in patches {
+                patch
+                    .register
+                    .call_once((&ctx,))
+                    .with_context(|| format!("Applying {} patch", patch.name))?;
+            }
+
+            Ok(())
+        }
+    }
 }

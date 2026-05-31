@@ -37,7 +37,7 @@ game = { path = "game" }
 windows.workspace = true
 retour.workspace = true
 
-thiserror = "2.0.18"
+inventory = "0.3.24"
 anyhow = "1.0.102"
 config = { version = "0.15.22", features = ["ini"], default-features = false }
 serde = { version = "1.0.228", features = ["derive"] }
