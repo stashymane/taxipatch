@@ -112,6 +112,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "game"
+version = "0.1.0"
+dependencies = [
+ "retour",
+ "static_assertions",
+ "windows",
+]
+
+[[package]]
 name = "generic-array"
 version = "0.14.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -347,11 +356,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "config",
+ "game",
  "hex",
  "retour",
  "serde",
  "sha2",
- "static_assertions",
  "thiserror",
  "windows",
 ]

@@ -1,5 +1,5 @@
 use crate::data::{PatchContext, CT3};
-use crate::game::BootLogoSequence_UpdateHook;
+use game::BootLogoSequence_UpdateHook;
 use std::mem::transmute;
 
 pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {

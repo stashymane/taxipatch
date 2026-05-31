@@ -2,7 +2,6 @@
 compile_error!("This patch can only be compiled for 32-bit Windows.");
 
 pub mod data;
-pub mod game;
 pub mod hooks;
 pub mod windows;
 

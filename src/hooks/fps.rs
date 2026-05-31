@@ -1,5 +1,5 @@
 use crate::data::{PatchContext, CT3};
-use crate::game::{FrameLimiter, FrameLimiter_UpdateHook};
+use game::{FrameLimiter, FrameLimiter_UpdateHook};
 use std::mem::transmute;
 
 pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {

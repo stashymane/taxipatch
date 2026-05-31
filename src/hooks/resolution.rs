@@ -1,8 +1,8 @@
 use crate::data::game::{GameSettings, WindowMode};
 use crate::data::{PackagedPtr, CT3};
 use crate::data::{PatchContext, User32};
-use crate::game::user32::CreateWindowExAHook;
-use crate::game::{BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook};
+use game::user32::CreateWindowExAHook;
+use game::{BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook};
 use std::mem::transmute;
 use windows::core::BOOL;
 use windows::Win32::UI::WindowsAndMessaging::{WS_POPUP, WS_VISIBLE};

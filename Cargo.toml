@@ -1,12 +1,13 @@
-[package]
-name = "taxipatch"
+[workspace]
+resolver = "3"
+members = ["game"]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
 
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]
+[workspace.dependencies]
+retour = { version = "0.4.0-alpha.4", features = ["nightly", "thiscall-abi", "static-detour"] }
 windows = {
     version = "0.62.2",
     features = [
@@ -22,13 +23,23 @@ windows = {
     ]
 }
 
+[package]
+name = "taxipatch"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+game = { path = "game" }
+
+windows.workspace = true
+retour.workspace = true
+
 thiserror = "2.0.18"
 anyhow = "1.0.102"
 config = { version = "0.15.22", features = ["ini"], default-features = false }
 serde = { version = "1.0.228", features = ["derive"] }
 sha2 = "0.11.0"
 hex = "0.4.3"
-
-retour = { version = "0.4.0-alpha.4", features = ["nightly", "thiscall-abi", "static-detour"] }
-
-static_assertions = "1.1.0"

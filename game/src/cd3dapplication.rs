@@ -1,4 +1,4 @@
-use crate::game::{CameraProjection, D3DDeviceSettings};
+use crate::{CameraProjection, D3DDeviceSettings};
 use retour::static_detour;
 use static_assertions::assert_eq_size;
 use windows::core::HRESULT;

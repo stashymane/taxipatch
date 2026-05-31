@@ -1,5 +1,5 @@
 use crate::data::{PatchContext, CT3};
-use crate::game::SetCameraPerspectiveHook;
+use game::SetCameraPerspectiveHook;
 use std::mem::transmute;
 
 pub fn initialize(ctx: &PatchContext) -> Result<(), retour::Error> {
