@@ -2,6 +2,10 @@ on:
   push:
     branches:
       - "master"
+    paths-ignore:
+      - .github
+      - .gitignore
+      - README.md
 
 env:
   CARGO_TERM_COLOR: always
