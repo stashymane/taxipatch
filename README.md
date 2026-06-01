@@ -17,7 +17,7 @@ Only tested with the Fairlight & Xplosiv `CT3.exe` executables. Others will refu
 
 1. Install [Ultimate ASI Loader] (dinput8.dll version, others may work, not tested)
 2. Get `taxipatch`:
-    * Release version from GitHub Releases (TODO - not yet released)
+    * Release version from [GitHub Releases]
     * [Development version from CI][GitHub Actions runs]
     * Build it yourself
 3. Put `taxipatch.asi` inside the `plugins` folder (that is next to `CT3.exe`)
@@ -39,4 +39,5 @@ Values that are commented out with `#` can be omitted and are configured by defa
 
 [Ultimate ASI Loader]: https://github.com/ThirteenAG/Ultimate-ASI-Loader
 
+[GitHub Releases]: https://github.com/stashymane/taxipatch/releases
 [GitHub Actions runs]: https://github.com/stashymane/taxipatch/actions/workflows/ci.yml
