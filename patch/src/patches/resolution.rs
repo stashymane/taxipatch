@@ -1,7 +1,9 @@
-use crate::data::game::{GameSettings, WindowMode};
-use crate::data::PackagedPtr;
+use crate::data::game::WindowMode;
+use crate::data::{PackagedPtr, Settings};
 use crate::data::{PatchContext, User32};
 use crate::patch::Patch;
+use crate::windows::display::get_display_info;
+use anyhow::Context;
 use game::user32::CreateWindowExAHook;
 use game::{BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook};
 use std::mem::transmute;
@@ -16,19 +18,56 @@ inventory::submit! {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
+struct ResolutionPatchState {
+    resolution_x: u32,
+    resolution_y: u32,
+    aspect_ratio: f32,
+    window_mode: WindowMode,
+}
+
+impl ResolutionPatchState {
+    fn from(settings: &Settings) -> anyhow::Result<Self> {
+        let default = get_display_info();
+        let (resolution_x, resolution_y) = match &settings.game.resolution {
+            Some(resolution) => resolution
+                .split('x')
+                .map(|dim| dim.parse::<u32>().context("Failed to parse resolution"))
+                .collect::<anyhow::Result<Vec<_>>>()
+                .map(|result| (result[0], result[1])),
+            None => Ok((default.width, default.height)),
+        }?;
+
+        let aspect_ratio = 0.1;
+        let window_mode = settings
+            .game
+            .mode
+            .clone()
+            .unwrap_or_else(|| WindowMode::Borderless);
+
+        Ok(Self {
+            resolution_x,
+            resolution_y,
+            aspect_ratio,
+            window_mode,
+        })
+    }
+}
+
 pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
+    let state = ResolutionPatchState::from(&ctx.settings)?;
+
     unsafe {
         CD3DApplication_InitWindowHook.wrap({
-            let settings = ctx.settings.game.clone();
-            let (width, height) = settings.resolution_u32().unwrap();
+            let state = state.to_owned();
 
             move |fun, app_ptr, hinstance| {
                 let app: &mut CD3DApplication = &mut (*app_ptr);
 
-                app.initial_window_width = width;
-                app.initial_window_height = height;
+                app.initial_window_width = state.resolution_x;
+                app.initial_window_height = state.resolution_y;
 
-                match settings.mode {
+                match state.window_mode {
                     WindowMode::Fullscreen => {
                         app.use_fullscreen_mode = true;
                     }
@@ -45,7 +84,7 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
 
         CreateWindowExAHook
             .initialize(transmute(ctx.offsets[User32::CreateWindowExA]), {
-                let settings = ctx.settings.game.clone();
+                let state = state.to_owned();
 
                 move |dw_ex_style,
                       lp_class_name,
@@ -59,22 +98,22 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
                       h_menu,
                       h_instance,
                       lp_param| {
-                    let (width, height) = settings.resolution_u32().unwrap();
-
-                    let dw_style = match settings.mode {
+                    let dw_style = match state.window_mode {
                         WindowMode::Fullscreen => dw_style,
                         WindowMode::Borderless => WS_VISIBLE | WS_POPUP,
                         WindowMode::Windowed => dw_style,
                     };
 
-                    let (x, y) = match settings.mode {
+                    let (x, y) = match state.window_mode {
                         WindowMode::Fullscreen | WindowMode::Windowed => (x, y),
                         WindowMode::Borderless => (0, 0),
                     };
 
-                    let (n_width, n_height) = match settings.mode {
+                    let (n_width, n_height) = match state.window_mode {
                         WindowMode::Fullscreen | WindowMode::Windowed => (n_width, n_height),
-                        WindowMode::Borderless => (width as i32, height as i32),
+                        WindowMode::Borderless => {
+                            (state.resolution_x as i32, state.resolution_y as i32)
+                        }
                     };
 
                     CreateWindowExAHook.call(
@@ -96,17 +135,18 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
             .enable()?;
 
         BuildPresentParamsHook.wrap({
-            let window_settings = ctx.settings.game.clone();
-            let width = ctx.pointers.dw_creation_width;
-            let height = ctx.pointers.dw_creation_height;
+            let state = state.to_owned();
+
+            let width_ptr = ctx.pointers.dw_creation_width;
+            let height_ptr = ctx.pointers.dw_creation_height;
 
             move |fun, app_ptr| {
-                patch_resolution_globals(width, height, &window_settings);
+                patch_resolution_globals(width_ptr, height_ptr, &state);
 
                 fun.call(app_ptr);
 
                 let app: &mut CD3DApplication = &mut (*app_ptr);
-                post_present_params(app, &window_settings);
+                post_present_params(app, &state);
             }
         })?;
     }
@@ -117,23 +157,19 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
 fn patch_resolution_globals(
     width: PackagedPtr<u32>,
     height: PackagedPtr<u32>,
-    settings: &GameSettings,
+    state: &ResolutionPatchState,
 ) {
     unsafe {
-        let (res_width, res_height) = settings.resolution_u32().unwrap();
-
-        width.write(res_width);
-        height.write(res_height);
+        width.write(state.resolution_x);
+        height.write(state.resolution_y);
     }
 }
 
-fn post_present_params(app: &mut CD3DApplication, settings: &GameSettings) {
-    let (width, height) = settings.resolution_u32().unwrap();
+fn post_present_params(app: &mut CD3DApplication, state: &ResolutionPatchState) {
+    app.present_parameters.BackBufferWidth = state.resolution_x;
+    app.present_parameters.BackBufferHeight = state.resolution_y;
 
-    app.present_parameters.BackBufferWidth = width;
-    app.present_parameters.BackBufferHeight = height;
-
-    match settings.mode {
+    match state.window_mode {
         WindowMode::Fullscreen => {}
         WindowMode::Borderless | WindowMode::Windowed => {
             app.present_parameters.Windowed = BOOL(1);
