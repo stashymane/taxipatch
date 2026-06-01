@@ -2,8 +2,9 @@ use crate::{CameraProjection, D3DDeviceSettings};
 use retour_util::wrapped_detour;
 use static_assertions::assert_eq_size;
 use windows::core::HRESULT;
-use windows::Win32::Foundation::{HINSTANCE, HWND};
+use windows::Win32::Foundation::{HINSTANCE, HWND, LRESULT, WPARAM};
 use windows::Win32::Graphics::Direct3D9::{IDirect3D9, IDirect3DDevice9, D3DPRESENT_PARAMETERS};
+use windows::Win32::UI::WindowsAndMessaging::MINMAXINFO;
 
 assert_eq_size!(CD3DApplication, [u8; 0x36c]);
 
@@ -52,6 +53,7 @@ pub struct CD3DApplication {
 
 wrapped_detour! {
     pub static CD3DApplication_InitWindowHook: unsafe extern "thiscall" fn(app_ptr: *mut CD3DApplication, hinstance: *mut HINSTANCE) -> HRESULT;
+    pub static CD3DApplication_WndProcDispatcherHook: unsafe extern "thiscall" fn(this: *mut CD3DApplication, hwnd: HWND, msg: u32, w_param: WPARAM, l_param: *mut MINMAXINFO) -> LRESULT;
     pub static BootLogoSequence_UpdateHook: unsafe extern "stdcall" fn();
 
     pub static BuildPresentParamsHook: unsafe extern "thiscall" fn(app_ptr: *mut CD3DApplication);

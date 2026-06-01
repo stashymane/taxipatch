@@ -16,6 +16,7 @@ pub enum CT3 {
     GameTick = 0,
     InitPostResolutionSwitch,
     CD3DInitWindow,
+    CD3DWndProcDispatcher,
     BuildPresentParams,
     FrameLimiterUpdate,
     BootLogoSequenceUpdate,
@@ -27,6 +28,7 @@ pub enum CT3 {
 #[derive(Debug, Copy, Clone)]
 pub enum User32 {
     CreateWindowExA = 0,
+    SetCursor,
     Count,
 }
 
@@ -45,6 +47,7 @@ impl Offsets {
         ct3[CT3::InitPostResolutionSwitch as usize] = 0x00007a97;
 
         ct3[CT3::CD3DInitWindow as usize] = 0x00028da0;
+        ct3[CT3::CD3DWndProcDispatcher as usize] = 0x00029010;
         ct3[CT3::BuildPresentParams as usize] = 0x000283d0;
         ct3[CT3::FrameLimiterUpdate as usize] = 0x00007d00;
 
@@ -67,6 +70,9 @@ impl Offsets {
             user32[User32::CreateWindowExA as usize] =
                 GetProcAddress(user32_handle, PCSTR(b"CreateWindowExA\0".as_ptr()))
                     .context("Failed to find USER32.DLL:CreateWindowExA")? as usize;
+            user32[User32::SetCursor as usize] =
+                GetProcAddress(user32_handle, PCSTR(b"SetCursor\0".as_ptr()))
+                    .context("Failed to find USER32.DLL:SetCursor")? as usize;
         }
 
         Ok(user32)

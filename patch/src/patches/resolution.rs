@@ -4,11 +4,15 @@ use crate::data::{PatchContext, User32};
 use crate::patch::Patch;
 use crate::windows::display::get_display_info;
 use anyhow::Context;
-use game::user32::CreateWindowExAHook;
-use game::{BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook};
+use game::user32::{CreateWindowExAHook, SetCursor};
+use game::{
+    BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook,
+    CD3DApplication_WndProcDispatcherHook,
+};
 use std::mem::transmute;
+use std::ptr::null_mut;
 use windows::core::BOOL;
-use windows::Win32::UI::WindowsAndMessaging::{WS_POPUP, WS_VISIBLE};
+use windows::Win32::UI::WindowsAndMessaging::{HCURSOR, WM_SETCURSOR, WS_POPUP, WS_VISIBLE};
 
 inventory::submit! {
     Patch {
@@ -76,6 +80,22 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
                 };
 
                 fun.call(app_ptr, hinstance)
+            }
+        })?;
+
+        CD3DApplication_WndProcDispatcherHook.wrap({
+            let is_borderless = state.window_mode == WindowMode::Borderless;
+            let set_cursor_offset = ctx.offsets[User32::SetCursor];
+
+            move |fun, this, hwnd, msg, w_param, l_param| {
+                let result = fun.call(this, hwnd, msg, w_param, l_param);
+
+                if is_borderless && msg == WM_SETCURSOR {
+                    let set_cursor: SetCursor = transmute(set_cursor_offset);
+                    set_cursor(HCURSOR(null_mut()));
+                }
+
+                result
             }
         })?;
 

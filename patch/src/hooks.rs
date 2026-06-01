@@ -2,7 +2,7 @@ use crate::data::{PatchContext, CT3};
 use game::unassigned::GameTickHook;
 use game::{
     BootLogoSequence_UpdateHook, BuildPresentParamsHook, CD3DApplication_InitWindowHook,
-    FrameLimiter_UpdateHook, SetCameraPerspectiveHook,
+    CD3DApplication_WndProcDispatcherHook, FrameLimiter_UpdateHook, SetCameraPerspectiveHook,
 };
 
 pub fn init_hooks(ctx: &PatchContext) -> anyhow::Result<()> {
@@ -10,6 +10,10 @@ pub fn init_hooks(ctx: &PatchContext) -> anyhow::Result<()> {
         CD3DApplication_InitWindowHook
             .initialize_at(ctx.offsets[CT3::CD3DInitWindow])?
             .enable()?;
+        CD3DApplication_WndProcDispatcherHook
+            .initialize_at(ctx.offsets[CT3::CD3DWndProcDispatcher])?
+            .enable()?;
+
         BootLogoSequence_UpdateHook
             .initialize_at(ctx.offsets[CT3::BootLogoSequenceUpdate])?
             .enable()?;

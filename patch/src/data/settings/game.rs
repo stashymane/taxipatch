@@ -8,7 +8,7 @@ pub struct GameSettings {
     pub fov: Option<f32>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default, Copy, Clone)]
+#[derive(Debug, Serialize, Deserialize, Default, Copy, Clone, Eq, PartialEq)]
 pub enum WindowMode {
     Fullscreen,
     #[default]
