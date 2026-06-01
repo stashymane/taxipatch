@@ -22,7 +22,6 @@ inventory::submit! {
 struct ResolutionPatchState {
     resolution_x: u32,
     resolution_y: u32,
-    aspect_ratio: f32,
     window_mode: WindowMode,
 }
 
@@ -38,7 +37,6 @@ impl ResolutionPatchState {
             None => Ok((default.width, default.height)),
         }?;
 
-        let aspect_ratio = 0.1;
         let window_mode = settings
             .game
             .mode
@@ -48,7 +46,6 @@ impl ResolutionPatchState {
         Ok(Self {
             resolution_x,
             resolution_y,
-            aspect_ratio,
             window_mode,
         })
     }
