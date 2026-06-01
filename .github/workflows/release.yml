@@ -1,0 +1,59 @@
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        target: [ i686-pc-windows-gnu ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc-mingw-w64-i686
+        if: matrix.target == 'i686-pc-windows-gnu'
+
+      - uses: actions/checkout@v6
+
+      - uses: moonrepo/setup-rust@v1
+        with:
+          targets: ${{ matrix.target }}
+          inherit-toolchain: true
+          cache-extra-identifier: ${{ matrix.os }}-${{ matrix.target }}-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: cargo build -p taxipatch --target ${{ matrix.target }} --release
+      - run: |
+          OUT_PATH="target/${{ matrix.target }}/release"
+          mv "$OUT_PATH/taxipatch.dll" "$OUT_PATH/taxipatch.asi"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: taxipatch-release
+          archive: false
+          path: |
+            target/${{ matrix.target }}/release/taxipatch.asi
+
+      - name: Create draft GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --draft \
+            --title "${{ github.ref_name }}" \
+            --notes "" \
+            "target/${{ matrix.target }}/release/taxipatch.asi"
