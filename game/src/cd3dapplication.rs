@@ -34,8 +34,8 @@ pub struct CD3DApplication {
     pub window_handle: HWND,
     pub _field_0xe4: usize,
     pub _field_0xe8: usize,
-    pub d3d9: *mut IDirect3D9,
-    pub d3d9device: *mut IDirect3DDevice9,
+    pub d3d9: IDirect3D9,
+    pub d3d9device: IDirect3DDevice9,
 
     pub _undefined: [u8; 0x35c - 0xf4], //0xf4 .. 0x35c
 

@@ -1,9 +1,8 @@
-use crate::data::game::WindowMode;
-use crate::data::{PackagedPtr, Settings};
+use crate::data::game::{BufferingMode, MultisamplingMode, WindowMode};
+use crate::data::Settings;
 use crate::data::{PatchContext, User32};
 use crate::patch::Patch;
 use crate::windows::display::get_display_info;
-use anyhow::Context;
 use game::user32::{CreateWindowExAHook, SetCursor};
 use game::{
     BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook,
@@ -11,7 +10,7 @@ use game::{
 };
 use std::mem::transmute;
 use std::ptr::null_mut;
-use windows::core::BOOL;
+use windows::Win32::Graphics::Direct3D9::D3DSWAPEFFECT_DISCARD;
 use windows::Win32::UI::WindowsAndMessaging::{HCURSOR, WM_SETCURSOR, WS_POPUP, WS_VISIBLE};
 
 inventory::submit! {
@@ -26,31 +25,33 @@ inventory::submit! {
 struct ResolutionPatchState {
     resolution_x: u32,
     resolution_y: u32,
+    refresh_rate: u32,
+    back_buffer_count: u32,
     window_mode: WindowMode,
+    multisampling: MultisamplingMode,
 }
 
 impl ResolutionPatchState {
     fn from(settings: &Settings) -> anyhow::Result<Self> {
         let default = get_display_info();
-        let (resolution_x, resolution_y) = match &settings.game.resolution {
-            Some(resolution) => resolution
-                .split('x')
-                .map(|dim| dim.parse::<u32>().context("Failed to parse resolution"))
-                .collect::<anyhow::Result<Vec<_>>>()
-                .map(|result| (result[0], result[1])),
-            None => Ok((default.width, default.height)),
-        }?;
 
-        let window_mode = settings
+        let (resolution_x, resolution_y) = settings
             .game
-            .mode
-            .clone()
-            .unwrap_or_else(|| WindowMode::Borderless);
+            .resolution_tuple(|| (default.width, default.height))?;
+
+        let buffer_mode = settings.game.buffering_mode.unwrap_or_default();
+        let back_buffer_count = match buffer_mode {
+            BufferingMode::Double => 1,
+            BufferingMode::Triple => 2,
+        };
 
         Ok(Self {
             resolution_x,
             resolution_y,
-            window_mode,
+            refresh_rate: settings.game.refresh_rate.unwrap_or(default.refresh_rate),
+            window_mode: settings.game.mode.unwrap_or_default(),
+            back_buffer_count,
+            multisampling: settings.game.multisampling.unwrap_or_default(),
         })
     }
 }
@@ -157,13 +158,13 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
             let width_ptr = ctx.pointers.dw_creation_width;
             let height_ptr = ctx.pointers.dw_creation_height;
 
-            move |fun, app_ptr| {
-                patch_resolution_globals(width_ptr, height_ptr, &state);
-
-                fun.call(app_ptr);
-
+            move |_, app_ptr| {
                 let app: &mut CD3DApplication = &mut (*app_ptr);
-                post_present_params(app, &state);
+
+                width_ptr.write(state.resolution_x);
+                height_ptr.write(state.resolution_y);
+
+                apply_present_params(app, state);
             }
         })?;
     }
@@ -171,26 +172,44 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn patch_resolution_globals(
-    width: PackagedPtr<u32>,
-    height: PackagedPtr<u32>,
-    state: &ResolutionPatchState,
-) {
-    unsafe {
-        width.write(state.resolution_x);
-        height.write(state.resolution_y);
-    }
-}
+fn apply_present_params(app: &mut CD3DApplication, state: ResolutionPatchState) {
+    let params = &mut app.present_parameters;
 
-fn post_present_params(app: &mut CD3DApplication, state: &ResolutionPatchState) {
-    app.present_parameters.BackBufferWidth = state.resolution_x;
-    app.present_parameters.BackBufferHeight = state.resolution_y;
+    let current_settings = if app.is_windowed {
+        &app.windowed_settings
+    } else {
+        &app.fullscreen_settings
+    };
+
+    let back_buffer_format = if state.window_mode == WindowMode::Fullscreen {
+        current_settings.display_mode.Format
+    } else {
+        unsafe { (*current_settings.device_settings_combo).back_buffer_format }
+    };
+
+    params.Windowed = app.is_windowed.into();
+    params.BackBufferCount = state.back_buffer_count;
+    params.BackBufferWidth = state.resolution_x;
+    params.BackBufferHeight = state.resolution_y;
+    params.BackBufferFormat = back_buffer_format;
+    params.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    params.hDeviceWindow = app.window_handle;
+
+    params.MultiSampleType = state.multisampling.into();
+    params.MultiSampleQuality = 0;
+
+    params.EnableAutoDepthStencil = true.into();
+    params.Flags = 2;
+    params.AutoDepthStencilFormat = current_settings.depth_stencil_format;
 
     match state.window_mode {
-        WindowMode::Fullscreen => {}
+        WindowMode::Fullscreen => {
+            params.FullScreen_RefreshRateInHz = state.refresh_rate;
+        }
         WindowMode::Borderless | WindowMode::Windowed => {
-            app.present_parameters.Windowed = BOOL(1);
-            app.present_parameters.FullScreen_RefreshRateInHz = 0;
+            params.FullScreen_RefreshRateInHz = 0;
         }
     }
+
+    params.PresentationInterval = current_settings.present_interval;
 }
