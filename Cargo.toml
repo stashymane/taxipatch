@@ -8,7 +8,10 @@ edition = "2024"
 
 [workspace.dependencies]
 retour = { version = "0.4.0-alpha.4", features = ["nightly", "thiscall-abi", "static-detour"] }
-retour-util = { git = "https://github.com/stashymane/retour-util.git" }
+retour-utils = {
+    git = "https://github.com/stashymane/retour-utils.git",
+    rev = "df9fe7953b2c1544dc163d6accb49dbb7b72e03e"
+}
 
 windows = {
     version = "0.62.2",

@@ -1,6 +1,6 @@
 use crate::data::PatchContext;
 use crate::Patch;
-use game::BootLogoSequence_UpdateHook;
+use game::Global;
 
 inventory::submit! {
     Patch {
@@ -16,15 +16,13 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     }
 
     unsafe {
-        BootLogoSequence_UpdateHook.wrap({
-            let counter = ctx.pointers.boot_logo_frame_counter;
-
+        game::hooks::boot_logo_sequence_update.hook({
             move |fun| {
-                counter.write(1024);
+                Global::BOOT_LOGO_FRAME_COUNTER.write(1024).unwrap();
 
-                fun.call()
+                fun.call(())
             }
-        })?;
+        });
     }
     Ok(())
 }

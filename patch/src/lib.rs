@@ -4,16 +4,16 @@
 compile_error!("This patch can only be compiled for 32-bit Windows.");
 
 pub mod data;
-pub mod hooks;
 pub mod patch;
 pub mod patches;
 pub mod windows;
 
 use crate::data::{ExecutableType, PatchContext, Settings};
-use crate::hooks::init_hooks;
 use crate::patch::Patch;
 use crate::windows::debug::message_box;
 use anyhow::Context;
+use game::libs::user32::User32;
+use game::{CD3DApplication, Camera, FrameLimiter};
 use std::process::exit;
 use ::windows::core::*;
 use ::windows::Win32::Foundation::HINSTANCE;
@@ -49,8 +49,8 @@ fn init() -> anyhow::Result<()> {
             log!("No patches available for config - skipping...");
             Ok(())
         }
-        ExecutableType::Xplosiv(offsets) | ExecutableType::Fairlight(offsets) => {
-            let ctx = PatchContext::from(offsets, settings)?;
+        ExecutableType::Xplosiv | ExecutableType::Fairlight => {
+            let ctx = PatchContext::from(settings)?;
             log!("Loaded context: {:?}", ctx);
 
             let mut patches: Vec<_> = inventory::iter::<Patch>.into_iter().collect();
@@ -64,7 +64,12 @@ fn init() -> anyhow::Result<()> {
             }
 
             log!("Applying hooks...");
-            init_hooks(&ctx)?;
+
+            User32::init_detours()?;
+            CD3DApplication::init_detours()?;
+            Camera::init_detours()?;
+            FrameLimiter::init_detours()?;
+            game::hooks::init_detours()?;
 
             Ok(())
         }

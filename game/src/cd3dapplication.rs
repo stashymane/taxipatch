@@ -1,5 +1,6 @@
-use crate::{CameraProjection, D3DDeviceSettings};
-use retour_util::wrapped_detour;
+use crate::locator::{ModuleLocator, PtrLocator};
+use crate::D3DDeviceSettings;
+use retour_utils::hook_impl;
 use static_assertions::assert_eq_size;
 use windows::core::HRESULT;
 use windows::Win32::Foundation::{HINSTANCE, HWND, LRESULT, WPARAM};
@@ -51,17 +52,29 @@ pub struct CD3DApplication {
     _field_0x36b: bool,
 }
 
-wrapped_detour! {
-    pub static CD3DApplication_InitWindowHook: unsafe extern "thiscall" fn(app_ptr: *mut CD3DApplication, hinstance: *mut HINSTANCE) -> HRESULT;
-    pub static CD3DApplication_WndProcDispatcherHook: unsafe extern "thiscall" fn(this: *mut CD3DApplication, hwnd: HWND, msg: u32, w_param: WPARAM, l_param: *mut MINMAXINFO) -> LRESULT;
-    pub static BootLogoSequence_UpdateHook: unsafe extern "stdcall" fn();
+#[hook_impl]
+impl CD3DApplication {
+    pub const INSTANCE: PtrLocator<CD3DApplication> =
+        PtrLocator::offset(ModuleLocator::Current, 0x00314f70);
 
-    pub static BuildPresentParamsHook: unsafe extern "thiscall" fn(app_ptr: *mut CD3DApplication);
-    pub static SetCameraPerspectiveHook: unsafe extern "thiscall" fn(
-        camera_projection_ptr: *mut CameraProjection,
-        fov: f32,
-        aspect: f32,
-        near_clip: f32,
-        far_clip: f32,
-    );
+    #[hook(pub unsafe extern "thiscall" CD3DApplication_InitWindow, offset = 0x00028da0, chain)]
+    pub fn init_window(app_ptr: *mut CD3DApplication, hinstance: *mut HINSTANCE) -> HRESULT {
+        unsafe { CD3DApplication_InitWindow.call(app_ptr, hinstance) }
+    }
+
+    #[hook(pub unsafe extern "thiscall" CD3DApplication_WndProcDispatcher, offset = 0x00029010, chain)]
+    pub fn wnd_proc_dispatcher(
+        this: *mut CD3DApplication,
+        hwnd: HWND,
+        msg: u32,
+        w_param: WPARAM,
+        l_param: *mut MINMAXINFO,
+    ) -> LRESULT {
+        unsafe { CD3DApplication_WndProcDispatcher.call(this, hwnd, msg, w_param, l_param) }
+    }
+
+    #[hook(pub unsafe extern "thiscall" CD3DApplication_BuildPresentParams, offset = 0x000283d0, chain)]
+    pub fn build_present_params(app_ptr: *mut CD3DApplication) {
+        unsafe { CD3DApplication_BuildPresentParams.call(app_ptr) }
+    }
 }

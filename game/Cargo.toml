@@ -4,8 +4,9 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+thiserror.workspace = true
 retour.workspace = true
-retour-util.workspace = true
+retour-utils.workspace = true
 windows.workspace = true
 
 static_assertions = "1.1.0"

@@ -1,14 +1,10 @@
 use crate::data::game::{BufferingMode, MultisamplingMode, WindowMode};
+use crate::data::PatchContext;
 use crate::data::Settings;
-use crate::data::{PatchContext, User32};
 use crate::patch::Patch;
 use crate::windows::display::get_display_info;
-use game::user32::{CreateWindowExAHook, SetCursor};
-use game::{
-    BuildPresentParamsHook, CD3DApplication, CD3DApplication_InitWindowHook,
-    CD3DApplication_WndProcDispatcherHook,
-};
-use std::mem::transmute;
+use game::libs::user32::User32;
+use game::{CD3DApplication, Global};
 use std::ptr::null_mut;
 use windows::Win32::Graphics::Direct3D9::D3DSWAPEFFECT_DISCARD;
 use windows::Win32::UI::WindowsAndMessaging::{HCURSOR, WM_SETCURSOR, WS_POPUP, WS_VISIBLE};
@@ -60,10 +56,10 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     let state = ResolutionPatchState::from(&ctx.settings)?;
 
     unsafe {
-        CD3DApplication_InitWindowHook.wrap({
+        CD3DApplication::init_window.hook({
             let state = state.to_owned();
 
-            move |fun, app_ptr, hinstance| {
+            move |app_ptr, hinstance, fun| {
                 let app: &mut CD3DApplication = &mut (*app_ptr);
 
                 app.initial_window_width = state.resolution_x;
@@ -80,93 +76,89 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
                     }
                 };
 
-                fun.call(app_ptr, hinstance)
+                fun.call((app_ptr, hinstance))
             }
-        })?;
+        });
 
-        CD3DApplication_WndProcDispatcherHook.wrap({
+        CD3DApplication::wnd_proc_dispatcher.hook({
             let is_borderless = state.window_mode == WindowMode::Borderless;
-            let set_cursor_offset = ctx.offsets[User32::SetCursor];
 
-            move |fun, this, hwnd, msg, w_param, l_param| {
-                let result = fun.call(this, hwnd, msg, w_param, l_param);
+            move |this, hwnd, msg, w_param, l_param, fun| {
+                let result = fun.call((this, hwnd, msg, w_param, l_param));
 
                 if is_borderless && msg == WM_SETCURSOR {
-                    let set_cursor: SetCursor = transmute(set_cursor_offset);
-                    set_cursor(HCURSOR(null_mut()));
+                    User32::set_cursor(HCURSOR(null_mut()));
                 }
 
                 result
             }
-        })?;
+        });
 
-        CreateWindowExAHook
-            .initialize(transmute(ctx.offsets[User32::CreateWindowExA]), {
-                let state = state.to_owned();
-
-                move |dw_ex_style,
-                      lp_class_name,
-                      lp_window_name,
-                      dw_style,
-                      x,
-                      y,
-                      n_width,
-                      n_height,
-                      h_wnd_parent,
-                      h_menu,
-                      h_instance,
-                      lp_param| {
-                    let dw_style = match state.window_mode {
-                        WindowMode::Fullscreen => dw_style,
-                        WindowMode::Borderless => WS_VISIBLE | WS_POPUP,
-                        WindowMode::Windowed => dw_style,
-                    };
-
-                    let (x, y) = match state.window_mode {
-                        WindowMode::Fullscreen | WindowMode::Windowed => (x, y),
-                        WindowMode::Borderless => (0, 0),
-                    };
-
-                    let (n_width, n_height) = match state.window_mode {
-                        WindowMode::Fullscreen | WindowMode::Windowed => (n_width, n_height),
-                        WindowMode::Borderless => {
-                            (state.resolution_x as i32, state.resolution_y as i32)
-                        }
-                    };
-
-                    CreateWindowExAHook.call(
-                        dw_ex_style,
-                        lp_class_name,
-                        lp_window_name,
-                        dw_style,
-                        x,
-                        y,
-                        n_width,
-                        n_height,
-                        h_wnd_parent,
-                        h_menu,
-                        h_instance,
-                        lp_param,
-                    )
-                }
-            })?
-            .enable()?;
-
-        BuildPresentParamsHook.wrap({
+        User32::create_window_ex_a.hook({
             let state = state.to_owned();
 
-            let width_ptr = ctx.pointers.dw_creation_width;
-            let height_ptr = ctx.pointers.dw_creation_height;
+            move |dw_ex_style,
+                  lp_class_name,
+                  lp_window_name,
+                  dw_style,
+                  x,
+                  y,
+                  n_width,
+                  n_height,
+                  h_wnd_parent,
+                  h_menu,
+                  h_instance,
+                  lp_param,
+                  fun| {
+                let dw_style = match state.window_mode {
+                    WindowMode::Fullscreen => dw_style,
+                    WindowMode::Borderless => WS_VISIBLE | WS_POPUP,
+                    WindowMode::Windowed => dw_style,
+                };
 
-            move |_, app_ptr| {
+                let (x, y) = match state.window_mode {
+                    WindowMode::Fullscreen | WindowMode::Windowed => (x, y),
+                    WindowMode::Borderless => (0, 0),
+                };
+
+                let (n_width, n_height) = match state.window_mode {
+                    WindowMode::Fullscreen | WindowMode::Windowed => (n_width, n_height),
+                    WindowMode::Borderless => {
+                        (state.resolution_x as i32, state.resolution_y as i32)
+                    }
+                };
+
+                fun.call((
+                    dw_ex_style,
+                    lp_class_name,
+                    lp_window_name,
+                    dw_style,
+                    x,
+                    y,
+                    n_width,
+                    n_height,
+                    h_wnd_parent,
+                    h_menu,
+                    h_instance,
+                    lp_param,
+                ))
+            }
+        });
+
+        CD3DApplication::build_present_params.hook({
+            let state = state.to_owned();
+
+            move |app_ptr, _| {
                 let app: &mut CD3DApplication = &mut (*app_ptr);
 
-                width_ptr.write(state.resolution_x);
-                height_ptr.write(state.resolution_y);
+                Global::DW_CREATION_WIDTH.write(state.resolution_x).unwrap();
+                Global::DW_CREATION_HEIGHT
+                    .write(state.resolution_y)
+                    .unwrap();
 
                 apply_present_params(app, state);
             }
-        })?;
+        });
     }
 
     Ok(())
@@ -187,19 +179,19 @@ fn apply_present_params(app: &mut CD3DApplication, state: ResolutionPatchState) 
         unsafe { (*current_settings.device_settings_combo).back_buffer_format }
     };
 
+    params.hDeviceWindow = app.window_handle;
     params.Windowed = app.is_windowed.into();
     params.BackBufferCount = state.back_buffer_count;
     params.BackBufferWidth = state.resolution_x;
     params.BackBufferHeight = state.resolution_y;
     params.BackBufferFormat = back_buffer_format;
     params.SwapEffect = D3DSWAPEFFECT_DISCARD;
-    params.hDeviceWindow = app.window_handle;
 
     params.MultiSampleType = state.multisampling.into();
     params.MultiSampleQuality = 0;
 
     params.EnableAutoDepthStencil = true.into();
-    params.Flags = 2;
+    params.Flags = 0;
     params.AutoDepthStencilFormat = current_settings.depth_stencil_format;
 
     match state.window_mode {

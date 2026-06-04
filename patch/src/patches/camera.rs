@@ -1,6 +1,6 @@
 use crate::data::PatchContext;
 use crate::patch::Patch;
-use game::SetCameraPerspectiveHook;
+use game::{CD3DApplication, Camera, Global};
 
 inventory::submit! {
     Patch {
@@ -14,14 +14,12 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     let desired_fov = ctx.settings.game.fov;
 
     unsafe {
-        SetCameraPerspectiveHook.wrap({
-            let stage = ctx.pointers.game_stage;
-            let substage = ctx.pointers.game_substage;
-            let cd3d_app = ctx.pointers.cd3d_app;
-
-            move |fun, camera, fov, aspect, near_clip, far_clip| {
-                let (fov, aspect) = if stage.read() == 1 && substage.read() == 3 {
-                    let cd3d_app = cd3d_app.as_ref();
+        Camera::set_perspective.hook({
+            move |camera, fov, aspect, near_clip, far_clip, fun| {
+                let (fov, aspect) = if Global::GAME_STAGE.read().unwrap() == 1
+                    && Global::GAME_SUBSTAGE.read().unwrap() == 3
+                {
+                    let cd3d_app = &mut *CD3DApplication::INSTANCE.ptr().unwrap();
 
                     let actual_aspect = cd3d_app.initial_window_width as f32
                         / cd3d_app.initial_window_height as f32;
@@ -32,9 +30,9 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
                     (fov, aspect)
                 };
 
-                return fun.call(camera, fov, aspect, near_clip, far_clip);
+                return fun.call((camera, fov, aspect, near_clip, far_clip));
             }
-        })?;
+        });
     }
     Ok(())
 }

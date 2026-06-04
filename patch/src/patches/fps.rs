@@ -1,6 +1,6 @@
 use crate::data::PatchContext;
 use crate::patch::Patch;
-use game::{FrameLimiter, FrameLimiter_UpdateHook};
+use game::FrameLimiter;
 
 inventory::submit! {
     Patch {
@@ -12,15 +12,15 @@ inventory::submit! {
 
 pub fn initialize(_ctx: &PatchContext) -> anyhow::Result<()> {
     unsafe {
-        FrameLimiter_UpdateHook.wrap({
-            move |fun, frame_limiter_ptr| {
+        FrameLimiter::update.hook({
+            move |frame_limiter_ptr, fun| {
                 let frame_limiter: &mut FrameLimiter = &mut *frame_limiter_ptr;
 
                 frame_limiter.adaptive_mode = false;
 
-                fun.call(frame_limiter_ptr);
+                fun.call((frame_limiter_ptr,));
             }
-        })?;
+        });
     }
     Ok(())
 }
