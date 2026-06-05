@@ -42,8 +42,9 @@ pub enum WindowMode {
 
 #[derive(Debug, Serialize, Deserialize, Default, Copy, Clone)]
 pub enum BufferingMode {
-    #[default]
+    // Double has a bug where scene changes retain the last frame, needs to be fixed before it's default
     Double,
+    #[default]
     Triple,
 }
 
