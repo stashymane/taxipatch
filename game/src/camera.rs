@@ -10,6 +10,11 @@ pub struct CameraProjection {
 
 #[hook_impl]
 impl Camera {
+    #[ptr(offset = 0x0031c3c8)]
+    pub const G_FOV: f32 = 0.0;
+    #[ptr(offset = 0x0031c420)]
+    pub const G_ASPECT_RATIO: f32 = 0.0;
+
     #[hook(pub unsafe extern "thiscall" Camera_SetPerspective, offset = 0x0001ee10, chain)]
     pub fn set_perspective(
         camera_projection_ptr: *mut CameraProjection,

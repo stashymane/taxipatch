@@ -16,10 +16,10 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     unsafe {
         Camera::set_perspective.hook({
             move |camera, fov, aspect, near_clip, far_clip, fun| {
-                let (fov, aspect) = if Global::GAME_STAGE.read().unwrap() == 1
-                    && Global::GAME_SUBSTAGE.read().unwrap() == 3
+                let (fov, aspect) = if Global::GAME_STAGE.read() == 1
+                    && Global::GAME_SUBSTAGE.read() == 3
                 {
-                    let cd3d_app = &mut *CD3DApplication::INSTANCE.ptr().unwrap();
+                    let cd3d_app = &mut *CD3DApplication::INSTANCE.as_ptr();
 
                     let actual_aspect = cd3d_app.initial_window_width as f32
                         / cd3d_app.initial_window_height as f32;

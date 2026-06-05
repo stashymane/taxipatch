@@ -151,10 +151,8 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
             move |app_ptr, _| {
                 let app: &mut CD3DApplication = &mut (*app_ptr);
 
-                Global::DW_CREATION_WIDTH.write(state.resolution_x).unwrap();
-                Global::DW_CREATION_HEIGHT
-                    .write(state.resolution_y)
-                    .unwrap();
+                Global::DW_CREATION_WIDTH.write(state.resolution_x);
+                Global::DW_CREATION_HEIGHT.write(state.resolution_y);
 
                 apply_present_params(app, state);
             }

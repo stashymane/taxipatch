@@ -1,4 +1,3 @@
-use crate::locator::{ModuleLocator, PtrLocator};
 use crate::D3DDeviceSettings;
 use retour_utils::hook_impl;
 use static_assertions::assert_eq_size;
@@ -54,8 +53,8 @@ pub struct CD3DApplication {
 
 #[hook_impl]
 impl CD3DApplication {
-    pub const INSTANCE: PtrLocator<CD3DApplication> =
-        PtrLocator::offset(ModuleLocator::Current, 0x00314f70);
+    #[ptr(offset = 0x00314f70)]
+    pub const INSTANCE: CD3DApplication = null_mut();
 
     #[hook(pub unsafe extern "thiscall" CD3DApplication_InitWindow, offset = 0x00028da0, chain)]
     pub fn init_window(app_ptr: *mut CD3DApplication, hinstance: *mut HINSTANCE) -> HRESULT {

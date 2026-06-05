@@ -18,7 +18,7 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     unsafe {
         game::hooks::boot_logo_sequence_update.hook({
             move |fun| {
-                Global::BOOT_LOGO_FRAME_COUNTER.write(1024).unwrap();
+                Global::BOOT_LOGO_FRAME_COUNTER.write(1024);
 
                 fun.call(())
             }

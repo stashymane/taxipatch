@@ -13,7 +13,7 @@ use crate::patch::Patch;
 use crate::windows::debug::message_box;
 use anyhow::Context;
 use game::libs::user32::User32;
-use game::{CD3DApplication, Camera, FrameLimiter};
+use game::{CD3DApplication, Camera, FrameLimiter, Global};
 use std::process::exit;
 use ::windows::core::*;
 use ::windows::Win32::Foundation::HINSTANCE;
@@ -65,6 +65,7 @@ fn init() -> anyhow::Result<()> {
 
             log!("Applying hooks...");
 
+            Global::init_detours()?;
             User32::init_detours()?;
             CD3DApplication::init_detours()?;
             Camera::init_detours()?;

@@ -1,5 +1,4 @@
-use crate::locator::{ModuleLocator, PtrLocator};
-use retour_utils::hook_module;
+use retour_utils::{hook_impl, hook_module};
 
 #[hook_module]
 pub mod hooks {
@@ -15,16 +14,21 @@ pub mod hooks {
 }
 
 pub struct Global {}
+
+#[hook_impl]
 impl Global {
-    pub const DW_CREATION_WIDTH: PtrLocator<u32> =
-        PtrLocator::offset(ModuleLocator::Current, 0x001ec5f8);
-    pub const DW_CREATION_HEIGHT: PtrLocator<u32> =
-        PtrLocator::offset(ModuleLocator::Current, 0x001ec5fc);
+    #[ptr(offset = 0x001ec5f8)]
+    pub const DW_CREATION_WIDTH: u32 = 0;
 
-    pub const GAME_STAGE: PtrLocator<u32> = PtrLocator::offset(ModuleLocator::Current, 0x003bc330);
-    pub const GAME_SUBSTAGE: PtrLocator<u32> =
-        PtrLocator::offset(ModuleLocator::Current, 0x003bc334);
+    #[ptr(offset = 0x001ec5fc)]
+    pub const DW_CREATION_HEIGHT: u32 = 0;
 
-    pub const BOOT_LOGO_FRAME_COUNTER: PtrLocator<i32> =
-        PtrLocator::offset(ModuleLocator::Current, 0x00317884);
+    #[ptr(offset = 0x003bc330)]
+    pub const GAME_STAGE: u32 = 0;
+
+    #[ptr(offset = 0x003bc334)]
+    pub const GAME_SUBSTAGE: u32 = 0;
+
+    #[ptr(offset = 0x00317884)]
+    pub const BOOT_LOGO_FRAME_COUNTER: i32 = 0;
 }

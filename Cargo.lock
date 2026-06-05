@@ -328,7 +328,7 @@ dependencies = [
 [[package]]
 name = "retour-utils"
 version = "0.2.1"
-source = "git+https://github.com/stashymane/retour-utils.git?rev=df9fe7953b2c1544dc163d6accb49dbb7b72e03e#df9fe7953b2c1544dc163d6accb49dbb7b72e03e"
+source = "git+https://github.com/stashymane/retour-utils.git?rev=82c95ccadced06d249bac25ac4c9102e1a801e15#82c95ccadced06d249bac25ac4c9102e1a801e15"
 dependencies = [
  "minidl",
  "retour",
@@ -338,7 +338,7 @@ dependencies = [
 [[package]]
 name = "retour-utils-impl"
 version = "0.2.0"
-source = "git+https://github.com/stashymane/retour-utils.git?rev=df9fe7953b2c1544dc163d6accb49dbb7b72e03e#df9fe7953b2c1544dc163d6accb49dbb7b72e03e"
+source = "git+https://github.com/stashymane/retour-utils.git?rev=82c95ccadced06d249bac25ac4c9102e1a801e15#82c95ccadced06d249bac25ac4c9102e1a801e15"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
