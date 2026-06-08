@@ -5,7 +5,7 @@
 Patch for Crazy Taxi 3. Successor to CT3Tweaks.
 
 > [!WARNING]
-> No stability is guaranteed yet. Will probably run fine, just don't be surprised.
+> Until the `1.0` release of this patch, you may encounter some bugs, and configuration options may change over time. Sorry in advance :)
 
 ## Requirements
 
