@@ -52,8 +52,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          read -r -d '' RELEASE_NOTES <<'EOF'
+          > [!NOTE]
+          > Not sure how to install? [Check the installation notes](https://github.com/stashymane/taxipatch#installation).
+          > For any questions or issues, feel free to start [a new discussion](https://github.com/stashymane/taxipatch/discussions).
+          EOF
+          
+          
           gh release create "${{ github.ref_name }}" \
             --draft \
             --title "${{ github.ref_name }}" \
-            --notes "" \
+            --generate-notes \
+            --notes "$RELEASE_NOTES" \
             "target/${{ matrix.target }}/release/taxipatch.asi"
