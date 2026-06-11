@@ -71,6 +71,7 @@ fn init() -> anyhow::Result<()> {
             Camera::init_detours()?;
             FrameLimiter::init_detours()?;
             game::hooks::init_detours()?;
+            // game::ct3config::init_detours()?;
 
             Ok(())
         }
