@@ -13,6 +13,10 @@ retour-utils = {
     rev = "82c95ccadced06d249bac25ac4c9102e1a801e15"
 }
 
+thiserror = "2.0.18"
+inventory = "0.3.24"
+serde = { version = "1.0.228", features = ["derive"] }
+
 windows = {
     version = "0.62.2",
     features = [
@@ -27,5 +31,3 @@ windows = {
         "Win32_System_Threading"
     ]
 }
-thiserror = "2.0.18"
-inventory = "0.3.24"
