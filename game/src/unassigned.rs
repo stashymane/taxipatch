@@ -11,6 +11,11 @@ pub mod hooks {
     pub fn boot_logo_sequence_update() {
         unsafe { BootLogoSequenceUpdate.call() }
     }
+
+    #[hook(unsafe extern "C" InitMapObjects, offset = 0x0009c250, chain)]
+    pub fn init_map_objects() {
+        unsafe { InitMapObjects.call() }
+    }
 }
 
 pub struct Global {}
@@ -31,4 +36,10 @@ impl Global {
 
     #[ptr(offset = 0x00317884)]
     pub const BOOT_LOGO_FRAME_COUNTER: i32 = 0;
+
+    #[ptr(offset = 0x003ca0d0)]
+    pub const SET_OBJECT_RENDER_DIST_SQUARED: f32 = 0.0;
+
+    #[ptr(offset = 0x003ca0dc)]
+    pub const DETAIL_OBJECT_RENDER_DIST_SQUARED: f32 = 0.0;
 }
