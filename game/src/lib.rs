@@ -5,6 +5,7 @@ mod d3ddevicesettings;
 mod frame_limiter;
 pub mod libs;
 mod unassigned;
+pub mod util;
 
 pub use camera::*;
 pub use cd3dapplication::*;
