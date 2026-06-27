@@ -59,7 +59,7 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
         CD3DApplication::init_window.hook({
             let state = state.to_owned();
 
-            move |app_ptr, hinstance, fun| {
+            move |fun, app_ptr, hinstance| {
                 let app: &mut CD3DApplication = &mut (*app_ptr);
 
                 app.initial_window_width = state.resolution_x;
@@ -83,7 +83,7 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
         CD3DApplication::wnd_proc_dispatcher.hook({
             let is_borderless = state.window_mode == WindowMode::Borderless;
 
-            move |this, hwnd, msg, w_param, l_param, fun| {
+            move |fun, this, hwnd, msg, w_param, l_param| {
                 let result = fun.call((this, hwnd, msg, w_param, l_param));
 
                 if is_borderless && msg == WM_SETCURSOR {
@@ -97,7 +97,8 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
         User32::create_window_ex_a.hook({
             let state = state.to_owned();
 
-            move |dw_ex_style,
+            move |fun,
+                  dw_ex_style,
                   lp_class_name,
                   lp_window_name,
                   dw_style,
@@ -108,8 +109,7 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
                   h_wnd_parent,
                   h_menu,
                   h_instance,
-                  lp_param,
-                  fun| {
+                  lp_param| {
                 let dw_style = match state.window_mode {
                     WindowMode::Fullscreen => dw_style,
                     WindowMode::Borderless => WS_VISIBLE | WS_POPUP,
@@ -148,7 +148,7 @@ pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
         CD3DApplication::build_present_params.hook({
             let state = state.to_owned();
 
-            move |app_ptr, _| {
+            move |_, app_ptr| {
                 let app: &mut CD3DApplication = &mut (*app_ptr);
 
                 Global::DW_CREATION_WIDTH.write(state.resolution_x);

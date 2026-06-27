@@ -13,7 +13,7 @@ inventory::submit! {
 pub fn initialize(_ctx: &PatchContext) -> anyhow::Result<()> {
     unsafe {
         FrameLimiter::update.hook({
-            move |frame_limiter_ptr, fun| {
+            move |fun, frame_limiter_ptr| {
                 let frame_limiter: &mut FrameLimiter = &mut *frame_limiter_ptr;
 
                 frame_limiter.adaptive_mode = false;

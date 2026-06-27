@@ -10,7 +10,7 @@ edition = "2024"
 retour = { version = "0.4.0-alpha.4", features = ["nightly", "thiscall-abi", "static-detour"] }
 retour-utils = {
     git = "https://github.com/stashymane/retour-utils.git",
-    rev = "82c95ccadced06d249bac25ac4c9102e1a801e15"
+    rev = "8ae664af1992e898379d88601a01723f4158ebba"
 }
 
 thiserror = "2.0.18"
@@ -21,13 +21,14 @@ windows = {
     version = "0.62.2",
     features = [
         "Win32_Foundation",
-        "Win32_UI_WindowsAndMessaging",
         "Win32_Graphics_Gdi",
         "Win32_Graphics_Direct3D9",
+        "Win32_Media_Audio_DirectSound",
         "Win32_System_SystemServices",
         "Win32_System_Diagnostics_Debug",
         "Win32_System_LibraryLoader",
         "Win32_System_Memory",
-        "Win32_System_Threading"
+        "Win32_System_Threading",
+        "Win32_UI_WindowsAndMessaging",
     ]
 }

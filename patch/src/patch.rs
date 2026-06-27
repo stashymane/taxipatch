@@ -1,5 +1,6 @@
 use crate::data::PatchContext;
 
+#[derive(Debug)]
 pub struct Patch {
     pub name: &'static str,
     pub priority: i32,
