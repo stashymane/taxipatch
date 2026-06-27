@@ -16,7 +16,7 @@ const POLL_INTERVAL: Duration = Duration::from_millis(2);
 
 pub fn initialize(_ctx: &PatchContext) -> anyhow::Result<()> {
     CStreamHandler::worker_thread.hook({
-        |fun, handler_ptr| unsafe {
+        |_, handler_ptr| {
             loop {
                 let before = Instant::now();
                 CStreamHandler::clean_streams(handler_ptr);
