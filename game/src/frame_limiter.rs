@@ -1,3 +1,4 @@
+use crate::TscTimer;
 use retour_utils::hook_impl;
 use static_assertions::assert_eq_size;
 
@@ -20,15 +21,6 @@ pub struct FrameLimiter {
     pub limiter_enabled: bool,
     pub adaptive_mode: bool,
     pub sleep_before_frame: bool,
-}
-
-assert_eq_size!(TscTimer, [u8; 0x8]);
-
-#[repr(C, packed)]
-#[derive(Debug)]
-pub struct TscTimer {
-    _low: u32,
-    _high: u32,
 }
 
 #[hook_impl]

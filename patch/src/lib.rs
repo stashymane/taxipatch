@@ -12,6 +12,7 @@ use crate::data::{ExecutableType, PatchContext, Settings};
 use crate::patch::Patch;
 use crate::windows::debug::message_box;
 use anyhow::Context;
+use game::audio::{CAudioStream, CStreamHandler};
 use game::libs::user32::User32;
 use game::{CD3DApplication, Camera, FrameLimiter, Global};
 use std::process::exit;
@@ -68,6 +69,8 @@ fn init() -> anyhow::Result<()> {
             Global::init_detours()?;
             User32::init_detours()?;
             CD3DApplication::init_detours()?;
+            CAudioStream::init_detours()?;
+            CStreamHandler::init_detours()?;
             Camera::init_detours()?;
             FrameLimiter::init_detours()?;
             game::hooks::init_detours()?;
