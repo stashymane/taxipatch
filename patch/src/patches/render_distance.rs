@@ -4,7 +4,7 @@ use game::hooks::init_map_objects;
 use game::Global;
 
 inventory::submit! {
-    Patch::new("render distance", initialize)
+    Patch::new("render distance", initialize).enabled(false)
 }
 
 pub fn initialize(_ctx: &PatchContext) -> anyhow::Result<()> {
