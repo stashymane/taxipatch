@@ -5,11 +5,7 @@ use std::thread::sleep;
 use std::time::{Duration, Instant};
 
 inventory::submit! {
-    Patch {
-        name: "audio cleanup thread",
-        priority: 0,
-        register: initialize
-    }
+    Patch::new("audio cleanup thread", initialize)
 }
 
 const POLL_INTERVAL: Duration = Duration::from_millis(2);

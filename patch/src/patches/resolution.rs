@@ -10,11 +10,7 @@ use windows::Win32::Graphics::Direct3D9::D3DSWAPEFFECT_DISCARD;
 use windows::Win32::UI::WindowsAndMessaging::{HCURSOR, WM_SETCURSOR, WS_POPUP, WS_VISIBLE};
 
 inventory::submit! {
-    Patch {
-        name: "resolution",
-        priority: 0,
-        register: initialize
-    }
+    Patch::new("resolution", initialize)
 }
 
 #[derive(Debug, Copy, Clone)]

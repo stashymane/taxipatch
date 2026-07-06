@@ -3,11 +3,7 @@ use crate::patch::Patch;
 use game::{CD3DApplication, Camera};
 
 inventory::submit! {
-    Patch {
-        name: "camera",
-        priority: 0,
-        register: initialize
-    }
+    Patch::new("camera", initialize)
 }
 
 pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {

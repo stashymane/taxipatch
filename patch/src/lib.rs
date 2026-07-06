@@ -58,6 +58,10 @@ fn init() -> anyhow::Result<()> {
             patches.sort_by_key(|it| -it.priority);
 
             for patch in patches {
+                if !patch.enabled {
+                    log!("Patch {} disabled, skipping...", patch.name);
+                    continue;
+                }
                 patch
                     .register
                     .call_once((&ctx,))

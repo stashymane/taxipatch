@@ -3,11 +3,7 @@ use crate::Patch;
 use game::Global;
 
 inventory::submit! {
-    Patch {
-        name: "intro skip",
-        priority: 0,
-        register: initialize
-    }
+    Patch::new("intro skip", initialize)
 }
 
 pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {

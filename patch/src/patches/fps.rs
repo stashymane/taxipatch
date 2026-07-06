@@ -3,11 +3,7 @@ use crate::patch::Patch;
 use game::FrameLimiter;
 
 inventory::submit! {
-    Patch {
-        name: "fps",
-        priority: 0,
-        register: initialize
-    }
+    Patch::new("fps", initialize)
 }
 
 pub fn initialize(_ctx: &PatchContext) -> anyhow::Result<()> {
