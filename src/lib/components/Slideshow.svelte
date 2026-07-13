@@ -2,8 +2,10 @@
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
 
+  import type { Picture } from "vite-imagetools";
+
   interface Props {
-    images: string[];
+    images: Picture[];
   }
 
   const { images }: Props = $props();
@@ -23,10 +25,11 @@
   {#key currentIndex}
     <div
       class="background-layer"
-      style:background-image="url('{images[currentIndex]}')"
       in:fade={{ duration: 1500 }}
       out:fade={{ duration: 1500 }}
-    ></div>
+    >
+      <enhanced:img src={images[currentIndex]} alt="background" />
+    </div>
   {/key}
 </div>
 
@@ -40,10 +43,18 @@
   }
 
   .background-layer {
+    display: block;
     position: absolute;
     inset: 0;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+  }
+
+  .background-layer :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
   }
 </style>
