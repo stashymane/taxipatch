@@ -12,6 +12,7 @@ export default {
         }),
         alias: {
             "@/*": "./src/*",
+            "$assets": "./src/assets",
         },
     },
 };
