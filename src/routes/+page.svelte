@@ -1,23 +1,8 @@
 <script lang="ts">
-    import Slideshow from "./lib/components/Slideshow.svelte";
+    import Slideshow from "$lib/components/Slideshow.svelte";
+    import Button from "$lib/components/Button.svelte";
 
-    let patchVersion = $state("???");
-
-    async function fetchPatchVersion() {
-        const response = await fetch("https://api.github.com/repos/stashymane/taxipatch/releases/latest", {cache: "no-store"});
-
-        if (!response.ok) {
-            throw new Error(`Failed to load GitHub release metadata: ${response.status}`);
-        }
-
-        const metadata = await response.json();
-
-        if (metadata.name) {
-            patchVersion = metadata.name;
-        }
-    }
-
-    fetchPatchVersion();
+    let {data} = $props();
 </script>
 
 <Slideshow/>
@@ -32,7 +17,7 @@
                 <span class="separator"></span>
                 <div class="detail">
                     <span>version</span>
-                    <span class="bold">{patchVersion}</span>
+                    <span class="bold">{data.patchVersion}</span>
                 </div>
             </div>
 
@@ -42,11 +27,11 @@
 
             <footer>
                 <div class="start">
-                    <a class="button lg" href="https://github.com/stashymane/taxipatch" aria-label="GitHub">
+                    <Button href="https://github.com/stashymane/taxipatch" size="lg" label="GitHub">
                         <svg class="icon" aria-hidden="true">
                             <use xlink:href="#icon-logo-github"></use>
                         </svg>
-                    </a>
+                    </Button>
                     <a class="link" href="https://github.com/stashymane/taxipatch#taxipatch" aria-label="About">
                         <svg class="icon" aria-hidden="true">
                             <use xlink:href="#icon-question-mark-24dp-w300"></use>
@@ -56,12 +41,12 @@
                 </div>
 
                 <div class="end">
-                    <a class="button primary lg" href="https://github.com/stashymane/taxipatch/releases/latest">
+                    <Button href="https://github.com/stashymane/taxipatch/releases/latest" variant="primary" size="lg">
                         <svg class="icon" aria-hidden="true">
                             <use xlink:href="#icon-download-24dp-w300"></use>
                         </svg>
                         <span>Download</span>
-                    </a>
+                    </Button>
                 </div>
             </footer>
         </div>

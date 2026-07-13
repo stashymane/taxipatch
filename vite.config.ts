@@ -1,5 +1,5 @@
 import {defineConfig} from "vite";
-import {svelte} from "@sveltejs/vite-plugin-svelte";
+import {sveltekit} from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 import {createSvgIconsPlugin} from "vite-plugin-svg-icons-ng";
 import * as path from "node:path";
@@ -8,12 +8,7 @@ import * as path from "node:path";
 export default defineConfig({
     plugins: [
         tailwindcss(),
-        svelte(),
+        sveltekit(),
         createSvgIconsPlugin({iconDirs: [path.resolve("src/assets/icons")]}),
     ],
-    resolve: {
-        alias: {
-            "@": path.resolve("./src"),
-        },
-    },
 });

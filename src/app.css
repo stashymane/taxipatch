@@ -1,8 +1,174 @@
-@import "./style.css";
+@import "tailwindcss";
 
 #app {
     margin: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
+}
+
+@layer base {
+    * {
+        @apply box-border;
+    }
+
+    :root {
+        --primary-color: #FBFF00;
+        --background-color: #080808;
+        --container-color: #161616;
+
+        --text-color: #fff;
+        --text-muted-color: rgba(255 255 255 / 0.6);
+
+        --animation-fn: cubic-bezier(0, .9, .6, .95);
+    }
+
+    body {
+        @apply m-0 text-xl;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+    }
+
+    a {
+        @apply no-underline;
+        color: unset;
+    }
+}
+
+@layer components {
+    .container {
+        @apply min-h-screen min-w-screen flex flex-col items-center justify-center;
+        background-color: rgba(0 0 0 / 0.5);
+    }
+
+    .content-border {
+        @apply inline-flex;
+
+        --border-radius: 1em;
+        border-radius: var(--border-radius);
+        --padding: 0.1em;
+        padding: var(--padding);
+
+        background-color: var(--container-color);
+        background-image: linear-gradient(
+                rgb(255 255 255 / 0.2),
+                rgb(150 150 150 / 0.1)
+        );
+
+        box-shadow: 0 0 5em rgba(0 0 0 / 0.5);
+    }
+
+    .content {
+        @apply w-200;
+        border-radius: calc(var(--border-radius) - var(--padding));
+        background-color: var(--container-color);
+        background-image: linear-gradient(
+                20deg,
+                transparent,
+                rgb(255 255 255 / 0.02) 20%,
+                rgb(255 255 255 / 0.05) 80%,
+                rgb(255 255 255 / 0.02)
+        );
+    }
+
+    .details {
+        @apply flex flex-row items-center justify-end text-[0.9em];
+        color: var(--text-muted-color);
+
+        .detail {
+            @apply py-[0.75em] px-[1em];
+
+            .bold {
+                @apply font-bold;
+                color: var(--text-color);
+            }
+        }
+
+        .separator {
+            @apply h-[0.1em] w-[0.5em];
+            background-color: color-mix(in oklch, var(--text-muted-color), transparent 50%);
+        }
+    }
+
+    header {
+        @apply flex flex-row items-center justify-center;
+        @apply font-light text-[3.5em];
+        font-family: 'Bitcount', sans-serif;
+        font-weight: 300;
+
+        background-color: var(--background-color);
+        background-image: radial-gradient(
+                circle at center in oklch,
+                color-mix(in oklch, var(--primary-color), transparent 85%),
+                color-mix(in oklch, var(--primary-color), transparent 95%)
+        );
+
+        border-width: 1px 0;
+        border-style: solid;
+        border-color: rgba(255 255 255 / 0.1);
+
+        box-shadow: 0 0 0.5em rgba(0 0 0 / 0.5) inset;
+
+        a {
+            @apply inline-flex items-center justify-center w-full p-[1rem];
+            @apply transition-[text-shadow] duration-200 ease-out;
+
+            color: color-mix(in oklch, var(--primary-color), white 90%);
+
+            --text-shadow-color: color-mix(in oklch, var(--primary-color), transparent 70%);
+            text-shadow: 0 0 0.2em var(--text-shadow-color),
+            0 0 0.4em var(--text-shadow-color),
+            0 0 0.6em var(--text-shadow-color),
+            0 0 0.8em var(--text-shadow-color);
+
+            &:hover {
+                --text-shadow-color: color-mix(in oklch, var(--primary-color), transparent 60%);
+            }
+        }
+    }
+
+    footer {
+        @apply flex flex-row items-center justify-between gap-[1em] p-[1em];
+
+        .start, .end {
+            @apply flex flex-row items-center gap-[1em];
+        }
+    }
+
+    .link {
+        @apply inline-flex flex-row items-center justify-center;
+        @apply px-[0.75em] gap-[0.75em];
+
+        line-height: 2.25em;
+        height: 1lh;
+        min-width: 1lh;
+
+        color: var(--text-color);
+
+        .icon {
+            width: 0.7lh;
+            height: 0.7lh;
+        }
+    }
+}
+
+@media (max-width: 840px) {
+    .content {
+        @apply w-150;
+    }
+}
+
+@media (max-width: 640px) {
+    .content {
+        @apply w-full;
+    }
+
+    .content-border {
+        @apply w-full mx-[1em];
+    }
+
+    footer {
+        @apply flex-col;
+    }
 }
