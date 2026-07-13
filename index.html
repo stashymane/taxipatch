@@ -10,63 +10,12 @@
 
     <title>taxipatch</title>
 
-    <link rel="stylesheet" href="/src/style.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
           rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Bitcount:slnt,wght@-8,300&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="slideshow" aria-hidden="true">
-    <div class="background-layer background-layer-a"></div>
-    <div class="background-layer background-layer-b"></div>
-</div>
-
-<div class="container">
-    <div class="content-border">
-        <div class="content">
-            <div class="details">
-                <div class="detail">
-                    <span>for Crazy Taxi 3</span>
-                </div>
-                <span class="separator"></span>
-                <div class="detail">
-                    <span>version</span>
-                    <span class="bold" id="patch-version">???</span>
-                </div>
-            </div>
-
-            <header>
-                <a href="https://github.com/stashymane/taxipatch" class="logo">taxipatch</a>
-            </header>
-
-            <footer>
-                <div class="start">
-                    <a class="button lg" href="https://github.com/stashymane/taxipatch" aria-label="GitHub">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-logo-github"></use>
-                        </svg>
-                    </a>
-                    <a class="link" href="https://github.com/stashymane/taxipatch#taxipatch" aria-label="About">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-question-mark-24dp-w300"></use>
-                        </svg>
-                        About
-                    </a>
-                </div>
-
-                <div class="end">
-                    <a class="button primary lg" href="https://github.com/stashymane/taxipatch/releases/latest">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-download-24dp-w300"></use>
-                        </svg>
-                        <span>Download</span>
-                    </a>
-                </div>
-            </footer>
-        </div>
-    </div>
-</div>
-
-<script type="module" src="/src/main.js"></script>
+<div id="app"></div>
+<script type="module" src="/src/main.ts"></script>
 </body>
 </html>

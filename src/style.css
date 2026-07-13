@@ -284,7 +284,6 @@
         background-position: center;
         background-size: cover;
         background-repeat: no-repeat;
-        opacity: 0;
         transition: opacity 1.5s ease;
         transform: scale(1.03);
     }
