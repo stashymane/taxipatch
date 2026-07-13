@@ -1,6 +1,7 @@
 <script lang="ts">
     import Slideshow from "$lib/components/Slideshow.svelte";
     import Button from "$lib/components/Button.svelte";
+    import Icon from "$lib/components/Icon.svelte";
 
     let {data} = $props();
 </script>
@@ -28,23 +29,17 @@
             <footer>
                 <div class="start">
                     <Button href="https://github.com/stashymane/taxipatch" size="lg" label="GitHub">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-logo-github"></use>
-                        </svg>
+                        <Icon name="logo-github"/>
                     </Button>
                     <a class="link" href="https://github.com/stashymane/taxipatch#taxipatch" aria-label="About">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-question-mark-24dp-w300"></use>
-                        </svg>
+                        <Icon name="question-mark-24dp-w300"/>
                         About
                     </a>
                 </div>
 
                 <div class="end">
                     <Button href="https://github.com/stashymane/taxipatch/releases/latest" variant="primary" size="lg">
-                        <svg class="icon" aria-hidden="true">
-                            <use xlink:href="#icon-download-24dp-w300"></use>
-                        </svg>
+                        <Icon name="download-24dp-w300"/>
                         <span>Download</span>
                     </Button>
                 </div>
