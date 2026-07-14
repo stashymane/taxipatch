@@ -25,8 +25,8 @@
   {#key currentIndex}
     <div
       class="background-layer"
-      in:fade={{ duration: 1500 }}
-      out:fade={{ duration: 1500 }}
+      in:fade={{ duration: 1500, delay: 4500 }}
+      out:fade={{ duration: 1500, delay: 4500 }}
     >
       <enhanced:img src={images[currentIndex]} alt="background" />
     </div>
