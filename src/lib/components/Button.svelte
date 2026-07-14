@@ -5,6 +5,7 @@
     href?: string;
     variant?: "default" | "primary";
     size?: "md" | "lg";
+    bold?: boolean;
     label?: string;
     children?: Snippet;
   }
@@ -13,6 +14,7 @@
     href,
     variant = "default",
     size = "md",
+    bold = false,
     label,
     children,
   }: Props = $props();
@@ -23,6 +25,7 @@
     {href}
     aria-label={label}
     class="button"
+    class:bold
     class:primary={variant === "primary"}
     class:lg={size === "lg"}
   >
@@ -32,6 +35,7 @@
   <button
     aria-label={label}
     class="button"
+    class:bold
     class:primary={variant === "primary"}
     class:lg={size === "lg"}
   >
@@ -44,8 +48,7 @@
 
   .button {
     @apply inline-flex flex-row items-center justify-center;
-    @apply px-[0.75em] gap-[0.75em];
-    @apply font-bold rounded-[0.75em];
+    @apply px-[0.5em] gap-[0.5em] rounded-[0.75em];
 
     line-height: 2.25em;
     height: 1lh;
@@ -92,14 +95,27 @@
     transform: translateY(calc(-1 * var(--button-lift-offset)));
 
     :global(.icon) {
-      width: 0.7lh;
-      height: 0.7lh;
-      margin: 0 -0.25em;
+      :global(svg) {
+        width: 0.6lh;
+        height: 0.6lh;
+      }
     }
 
     :global(.icon:only-child) {
       margin: 0 -0.5em;
     }
+
+    :global(.label:first-child) {
+      margin-left: 0.25em;
+    }
+
+    :global(.label:last-child) {
+      margin-right: 0.25em;
+    }
+  }
+
+  .button.bold {
+    @apply font-bold;
   }
 
   .button:hover {
