@@ -21,7 +21,7 @@ impl Patch {
     }
 
     pub const fn enabled(mut self, value: bool) -> Self {
-        self.enabled = false;
+        self.enabled = value;
         self
     }
 
