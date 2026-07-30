@@ -36,10 +36,8 @@ If you want to adjust anything, you can do so there.
 * 60FPS mode
 * Borderless & windowed mode
 * FOV & correct aspect ratio
-* Skip intro logos
-* Song change stutter fix
-
-#### that's it (for now)
+* Skips intro logos
+* Fixes various game bugs
 
 ## Configuration
 

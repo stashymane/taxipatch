@@ -6,7 +6,7 @@ pub struct Camera {}
 #[hook_impl]
 impl Camera {
     #[ptr(offset = 0x0031c3c0)]
-    pub const G_CAMERA: *mut Camera = null_mut();
+    pub const G_CAMERA: *mut Camera = std::ptr::null_mut();
 
     #[ptr(offset = 0x0031c3c8)]
     pub const G_FOV: f32 = 0.0;
@@ -34,6 +34,11 @@ impl Camera {
         far_clip: f32,
     ) {
         unsafe { Camera_SetPerspective.call(camera_ptr, fov, aspect, near_clip, far_clip) }
+    }
+
+    #[hook(pub unsafe extern "stdcall" Camera_Update, offset = 0x000329d0)]
+    pub fn update() {
+        unsafe { Camera_Update.call() }
     }
 
     #[hook(pub unsafe extern "stdcall" Camera_UpdateFromGlobals, offset = 0x00031c80, chain)]
