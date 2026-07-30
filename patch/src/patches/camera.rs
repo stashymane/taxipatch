@@ -1,22 +1,33 @@
 use crate::data::PatchContext;
 use crate::patch::Patch;
-use game::{CD3DApplication, Camera};
+use game::{CD3DApplication, Camera, Global};
 
 inventory::submit! {
     Patch::new("camera", initialize)
+}
+
+fn is_in_race() -> bool {
+    unsafe { Global::GAME_STAGE.read() == 1 && Global::GAME_SUBSTAGE.read() == 3 }
 }
 
 pub fn initialize(ctx: &PatchContext) -> anyhow::Result<()> {
     let desired_fov = ctx.settings.game.fov;
 
     unsafe {
-        Camera::update_camera_from_globals.hook(move |_| {
+        Camera::update_camera_from_globals.hook(move |original| {
+            if !is_in_race() {
+                return original.call(());
+            }
+
             let cd3d_app = &mut *CD3DApplication::INSTANCE.as_ptr();
 
             let actual_aspect =
                 cd3d_app.initial_window_width as f32 / cd3d_app.initial_window_height as f32;
 
             let actual_fov = desired_fov.unwrap_or_else(|| fov_from_aspect(actual_aspect));
+
+            Camera::G_FOV.write(actual_fov);
+            Camera::G_ASPECT_RATIO.write(actual_aspect);
 
             Camera::set_perspective(
                 Camera::G_CAMERA.read(),
