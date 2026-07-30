@@ -16,10 +16,10 @@ use game::audio::{CAudioStream, CStreamHandler};
 use game::libs::user32::User32;
 use game::{CD3DApplication, Camera, FrameLimiter, Global};
 use std::process::exit;
-use ::windows::core::*;
 use ::windows::Win32::Foundation::HINSTANCE;
 use ::windows::Win32::Foundation::*;
 use ::windows::Win32::System::SystemServices::*;
+use ::windows::core::*;
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case, unused_variables)]
@@ -42,8 +42,11 @@ pub unsafe extern "system" fn DllMain(
 }
 
 fn init() -> anyhow::Result<()> {
-    let exe_type = ExecutableType::load()?;
     let settings = Settings::load().context("Failed to load settings")?;
+    let exe_type = match ExecutableType::load() {
+        Ok(it) => it,
+        Err(err) => if settings.general.ignore_checksum_mismatch { ExecutableType::Xplosiv } else { Err(err)? }
+    };
 
     match exe_type {
         ExecutableType::Config => {

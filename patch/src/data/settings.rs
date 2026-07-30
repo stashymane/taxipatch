@@ -1,7 +1,9 @@
 pub mod game;
 pub mod patches;
+pub mod general;
 
 use crate::data::game::GameSettings;
+use crate::data::general::GeneralSettings;
 use crate::data::patches::PatchSettings;
 use anyhow::Context;
 use config::{Config, File};
@@ -17,6 +19,8 @@ pub struct Settings {
     pub game: GameSettings,
     #[serde(default)]
     pub patches: PatchSettings,
+    #[serde(default)]
+    pub general: GeneralSettings,
 }
 
 impl Settings {
