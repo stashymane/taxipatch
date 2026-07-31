@@ -12,7 +12,6 @@ pub struct GameSettings {
     pub mode: Option<WindowMode>,
     pub buffering_mode: Option<BufferingMode>,
     pub multisampling: Option<MultisamplingMode>,
-
     pub fov: Option<f32>,
 }
 

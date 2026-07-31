@@ -1,7 +1,9 @@
 pub mod game;
 pub mod patches;
 pub mod general;
+pub mod distance;
 
+use crate::data::distance::DistanceSettings;
 use crate::data::game::GameSettings;
 use crate::data::general::GeneralSettings;
 use crate::data::patches::PatchSettings;
@@ -17,6 +19,8 @@ const CONFIG_CONTENTS: &str = include_str!("../../resources/config.ini");
 pub struct Settings {
     #[serde(default)]
     pub game: GameSettings,
+    #[serde(default)]
+    pub distance: DistanceSettings,
     #[serde(default)]
     pub patches: PatchSettings,
     #[serde(default)]

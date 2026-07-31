@@ -14,7 +14,7 @@ use crate::windows::debug::message_box;
 use anyhow::Context;
 use game::audio::{CAudioStream, CStreamHandler};
 use game::libs::user32::User32;
-use game::{CD3DApplication, Camera, Effects, FrameLimiter, Global};
+use game::{CD3DApplication, Camera, Effects, FrameLimiter, Global, Map};
 use std::process::exit;
 use ::windows::Win32::Foundation::HINSTANCE;
 use ::windows::Win32::Foundation::*;
@@ -81,6 +81,7 @@ fn init() -> anyhow::Result<()> {
             Camera::init_detours()?;
             Effects::init_detours()?;
             FrameLimiter::init_detours()?;
+            Map::init_detours()?;
             game::hooks::init_detours()?;
             // game::ct3config::init_detours()?;
 
