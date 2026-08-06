@@ -36,7 +36,7 @@ impl Camera {
         unsafe { Camera_SetPerspective.call(camera_ptr, fov, aspect, near_clip, far_clip) }
     }
 
-    #[hook(pub unsafe extern "stdcall" Camera_Update, offset = 0x000329d0)]
+    #[hook(pub unsafe extern "stdcall" Camera_Update, offset = 0x000329d0, chain)]
     pub fn update() {
         unsafe { Camera_Update.call() }
     }

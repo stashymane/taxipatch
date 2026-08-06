@@ -6,12 +6,12 @@ inventory::submit! {
     Patch::new("camera", initialize)
 }
 
-fn is_in_race() -> bool {
+pub fn is_in_race() -> bool {
     unsafe { Global::GAME_STAGE.read() == 1 && Global::GAME_SUBSTAGE.read() == 3 }
 }
 
 /// Apply the same perspective the main renderer uses (widescreen FOV / aspect).
-pub(crate) fn apply_renderer_perspective(desired_fov: Option<f32>) {
+pub fn apply_renderer_perspective(desired_fov: Option<f32>) {
     if !is_in_race() {
         return;
     }
