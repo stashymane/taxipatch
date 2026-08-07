@@ -5,3 +5,4 @@ pub mod fps;
 pub mod map_render_distance;
 pub mod resolution;
 pub mod skip_intro;
+pub mod ui_texcoord;
