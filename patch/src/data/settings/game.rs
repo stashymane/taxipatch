@@ -1,31 +1,52 @@
-use anyhow::Context;
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
 use windows::Win32::Graphics::Direct3D9::{
     D3DMULTISAMPLE_2_SAMPLES, D3DMULTISAMPLE_4_SAMPLES, D3DMULTISAMPLE_8_SAMPLES,
     D3DMULTISAMPLE_NONE, D3DMULTISAMPLE_TYPE,
 };
+
+#[derive(Debug, Error)]
+pub enum ResolutionError {
+    #[error("resolution must be [WIDTH]x[HEIGHT]")]
+    InvalidFormat,
+    #[error("Failed to parse resolution width")]
+    InvalidWidth(#[source] std::num::ParseIntError),
+    #[error("Failed to parse resolution height")]
+    InvalidHeight(#[source] std::num::ParseIntError),
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct GameSettings {
     pub resolution: Option<String>,
     pub refresh_rate: Option<u32>,
     pub mode: Option<WindowMode>,
-    pub buffering_mode: Option<BufferingMode>,
     pub multisampling: Option<MultisamplingMode>,
     pub fov: Option<f32>,
 }
 
 impl GameSettings {
-    pub fn resolution_tuple<F>(&self, default: F) -> anyhow::Result<(u32, u32)>
+    pub fn resolution_tuple<F>(&self, default: F) -> Result<(u32, u32), ResolutionError>
     where
         F: FnOnce() -> (u32, u32),
     {
         match &self.resolution {
-            Some(resolution) => resolution
-                .split('x')
-                .map(|dim| dim.parse::<u32>().context("Failed to parse resolution"))
-                .collect::<anyhow::Result<Vec<_>>>()
-                .map(|result| (result[0], result[1])),
+            Some(resolution) => {
+                let mut parts = resolution.split('x');
+                let width = parts
+                    .next()
+                    .ok_or(ResolutionError::InvalidFormat)?
+                    .parse()
+                    .map_err(ResolutionError::InvalidWidth)?;
+                let height = parts
+                    .next()
+                    .ok_or(ResolutionError::InvalidFormat)?
+                    .parse()
+                    .map_err(ResolutionError::InvalidHeight)?;
+                if parts.next().is_some() {
+                    return Err(ResolutionError::InvalidFormat);
+                }
+                Ok((width, height))
+            }
             None => Ok(default()),
         }
     }
@@ -37,14 +58,6 @@ pub enum WindowMode {
     #[default]
     Borderless,
     Windowed,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default, Copy, Clone)]
-pub enum BufferingMode {
-    // Double has a bug where scene changes retain the last frame, needs to be fixed before it's default
-    Double,
-    #[default]
-    Triple,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]

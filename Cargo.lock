@@ -436,6 +436,7 @@ dependencies = [
  "inventory",
  "serde",
  "sha2",
+ "thiserror",
  "windows",
 ]
 

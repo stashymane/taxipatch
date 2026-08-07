@@ -13,6 +13,7 @@ windows.workspace = true
 inventory.workspace = true
 
 anyhow = "1.0.102"
+thiserror.workspace = true
 config = { version = "0.15.22", features = ["ini"], default-features = false }
 serde.workspace = true
 sha2 = "0.11.0"
